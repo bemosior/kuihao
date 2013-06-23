@@ -3,6 +3,17 @@
   <head>
     <title>Kuihao : Factory Floor Designer</title>
     <link rel="shortcut icon" href="about:blank">
+    <style>
+#floor {
+  float: left;
+}
+#actions {
+  float: left;
+}
+#workcenterinfo {
+  float: left;
+}
+    </style>
   </head>
   <body ng-controller="MainCtrl">
     <div id="floor"></div>
@@ -10,7 +21,7 @@
       <button ng-click="addWorkCenter()">Add Work Center</button>
       <button ng-click="addProduct()">Add Product</button>
     </div>
-    <div id="workcenterinfo"></div>
+    <div id="workcenterinfo">{{info}}</div>
     <script src="raphael-min.js"></script>
     <script src="angular.js"></script>
     <script src="app.js"></script>

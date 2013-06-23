@@ -48,6 +48,24 @@ kuihaoApp.controller('MainCtrl', function($scope) {
     };
   };
 
+  var display_info = function() {
+    switch (this.type) {
+      case "rect":
+        $scope.$apply(function($scope) {
+          $scope.info = "stuff!";
+        });
+        break;
+      default:
+        break;
+    };
+  };
+
+  var display_clear = function() {
+    $scope.$apply(function($scope) {
+      $scope.info = "";
+    });
+  };
+
   var r = Raphael("floor", 640, 480);
 
   var state = "normal";
@@ -62,8 +80,6 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   var workCenterColor  = Raphael.getColor();
   Raphael.getColor(); Raphael.getColor(); Raphael.getColor();
   var productColor     = Raphael.getColor();
-  console.log(workCenterColor);
-  console.log(floor);
 
   for (var i=0; i < workCenters.length; i++) {
     workCenterShapes.push(
@@ -76,6 +92,7 @@ kuihaoApp.controller('MainCtrl', function($scope) {
           "cursor" : "move",
         })
         .drag(drag_move, drag_start)
+        .hover(display_info, display_clear)
     )
   };
 
@@ -107,6 +124,7 @@ kuihaoApp.controller('MainCtrl', function($scope) {
           "cursor" : "move",
         })
         .drag(drag_move, drag_start)
+        .hover(display_info, display_clear)
     );
   };
 
