@@ -66,13 +66,38 @@ kuihaoApp.controller('MainCtrl', function($scope) {
     });
   };
 
+  var draw_workcenter = function(wc) {
+    var ret = r.set()
+    ret.push(
+      r.rect( 320, 240, 60, 40, 10 )
+    );
+    var offset = -wc.inputs.length/2*30
+    for (var i=0; i < wc.inputs.length; i++) {
+      ret.push(r.circle(300, 260+offset*i, 10));
+    };
+    for (var i=0; i < wc.outputs.length; i++) {
+      ret.push(r.circle(400, 260, 10));
+    };
+    console.log(ret);
+    return ret;
+  };
+
   var r = Raphael("floor", 640, 480);
 
   var state = "normal";
 
   var floor = r.rect( 0, 0, 640, 480);
 
-  var workCenters      = [{"wc1":"1"}];
+  var workCenters      = [{
+    "name": "workcenter1",
+    "inputs": [
+      "server",
+      "license",
+    ],
+    "outputs": [
+      "server/licensed",
+    ]
+  }];
   var workCenterShapes = [];
   var products         = [{"p1":"1"}];
   var productShapes    = [];
@@ -81,6 +106,7 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   Raphael.getColor(); Raphael.getColor(); Raphael.getColor();
   var productColor     = Raphael.getColor();
 
+  draw_workcenter(workCenters[0]);
   for (var i=0; i < workCenters.length; i++) {
     workCenterShapes.push(
       r.rect(290, 80, 60, 40, 10)
@@ -129,6 +155,20 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   };
 
   $scope.addProduct = function() {
+    products.push({
+      "pnew": "2"
+    })
+    productShapes.push(
+      r.circle( 50, 50, 10)
+        .attr({
+          fill: productColor,
+          stroke: productColor,
+          "fill-opacity": 1,
+          "stroke-width": 2,
+          "cursor" : "move",
+        })
+        .drag(drag_move, drag_start)
+    );
   };
 
 });
