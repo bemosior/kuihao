@@ -1,6 +1,13 @@
 var isBlank = function(str) {
   return (str == null) || (/^\s*$/.test(str));
-}
+};
+
+var generateUUID = function() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random()*16|0, v = c == 'x' ? r : (r&0x3|0x8);
+    return v.toString(16);
+  });
+};
 
 var kuihaoApp = angular.module('kuihaoApp', [], function() {
 });
@@ -95,38 +102,28 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   var productColor     = Raphael.getColor();
 
   $scope.addWorkCenter = function() {
-    workCenters.push({
-      "wcname": "new wc " + Math.floor(Math.random()*10000 + 1),
-    });
-    workCenterShapes.push(
-      floorDiagram.rect(260, 220, WORKCENTER.width, WORKCENTER.height, 10)
-        .attr({
-          fill: workCenterColor,
-          stroke: workCenterColor,
-          "fill-opacity": 1,
-          "stroke-width": 2,
-          "cursor" : "move",
-        })
-        .drag(drag_move, drag_start)
-        .hover(display_info, display_clear)
-    );
+    var uuid = generateUUID();
+    var wc = {
+      id: uuid,
+      inputs: [],
+      outputs: [],
+      loc: [WIDTH/2, HEIGHT/2],
+      type: "workcenter",
+    };
+    stations[uuid] = wc;
+    redraw();
   };
 
   $scope.addProduct = function() {
-    products.push({
-      "pnew": "2"
-    })
-    productShapes.push(
-      floorDiagram.circle( 50, 50, 10)
-        .attr({
-          fill: productColor,
-          stroke: productColor,
-          "fill-opacity": 1,
-          "stroke-width": 2,
-          "cursor" : "move",
-        })
-        .drag(drag_move, drag_start)
-    );
+    var uuid = generateUUID();
+    var product = {
+      id: uuid,
+      name: "",
+      loc: [WIDTH/2, HEIGHT/2],
+      type: "product",
+    };
+    stations[uuid] = product;
+    redraw();
   };
 
   var stations = {
