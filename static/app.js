@@ -7,31 +7,47 @@ var kuihaoApp = angular.module('kuihaoApp', [], function() {
 
 kuihaoApp.controller('MainCtrl', function($scope) {
 
+  var WIDTH = 800;
+  var HEIGHT = 600;
+  var WORKCENTER = {
+    height: 60,
+    width: 60,
+  };
+  var PRODUCT = {
+    height: 40,
+    width: 40,
+  };
+
   var drag_move = function (dx, dy) {
     var att;
+    var loc;
     switch (this.type) {
       case "rect":
         var nextx = this.ox + dx;
         if (nextx < 0) nextx = 0;
-        if (nextx + 60 > 640) nextx = 640-60;
+        if (nextx + WORKCENTER.width > WIDTH) nextx = WIDTH-WORKCENTER.width;
         var nexty = this.oy + dy;
         if (nexty < 0) nexty = 0;
-        if (nexty + 40 > 480) nexty = 480-40;
+        if (nexty + WORKCENTER.height > HEIGHT) nexty = HEIGHT-WORKCENTER.height;
         att = {x: nextx, y: nexty};
+        loc = [nextx+WORKCENTER.width/2, nexty+WORKCENTER.height/2];
         break;
       case "circle":
         var nextx = this.ox + dx;
-        if (nextx < 0) nextx = 0;
-        if (nextx + 60 > 640) nextx = 640-60;
+        if (nextx < PRODUCT.width/2) nextx = PRODUCT.width/2;
+        if (nextx + PRODUCT.width/2 > WIDTH) nextx = WIDTH-PRODUCT.width/2;
         var nexty = this.oy + dy;
-        if (nexty < 0) nexty = 0;
-        if (nexty + 40 > 480) nexty = 480-40;
+        if (nexty < PRODUCT.height/2) nexty = PRODUCT.height/2;
+        if (nexty + PRODUCT.height/2 > HEIGHT) nexty = HEIGHT-PRODUCT.height/2;
         att = {cx: nextx, cy: nexty};
+        loc = [nextx, nexty];
         break;
       default:
         break;
     };
     this.attr(att);
+    this.data("station").loc = loc;
+    update_connections(this.data("station"));
   };
 
   var drag_start = function() {
@@ -66,25 +82,10 @@ kuihaoApp.controller('MainCtrl', function($scope) {
     });
   };
 
-  var draw_workcenter = function(wc) {
-    var ret = r.set()
-    ret.push(
-      r.rect( 320, 240, 60, 40, 10 )
-    );
-    var offset = -wc.inputs.length/2*30
-    for (var i=0; i < wc.inputs.length; i++) {
-      ret.push(r.circle(300, 260+offset*i, 10));
-    };
-    for (var i=0; i < wc.outputs.length; i++) {
-      ret.push(r.circle(400, 260, 10));
-    };
-    console.log(ret);
-    return ret;
-  };
-
   var floorDiagram;
   var workCenters, workCenterShapes;
   var products, productShapes;
+  var connections, connectionShapes;
   var floor;
 
   var state = "normal";
@@ -93,95 +94,12 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   Raphael.getColor(); Raphael.getColor(); Raphael.getColor();
   var productColor     = Raphael.getColor();
 
-  var drawProducts = function() {
-    for (var i=0; i < products.length; i++) {
-      productShapes.push(
-        floorDiagram.circle( products[i].loc[0], products[i].loc[1], 10)
-          .attr({
-            fill: productColor,
-            stroke: productColor,
-            "fill-opacity": 1,
-            "stroke-width": 2,
-            "cursor" : "move",
-          })
-          .drag(drag_move, drag_start)
-      );
-    };
-  };
-
-  var drawWorkCenters = function() {
-    for (var i=0; i < workCenters.length; i++) {
-      workCenterShapes.push(
-        floorDiagram.rect(workCenters[i].loc[0], workCenters[i].loc[1], 60, 40, 10)
-          .attr({
-            fill: workCenterColor,
-            stroke: workCenterColor,
-            "fill-opacity": 1,
-            "stroke-width": 2,
-            "cursor" : "move",
-          })
-          .drag(drag_move, drag_start)
-          .hover(display_info, display_clear)
-      );
-    };
-  };
-
-  var drawConnections = function() {
-  };
-
-  $scope.resetInit = function() {
-    if ((typeof floorDiagram === 'undefined') || (floorDiagram === null)) {
-      floorDiagram = Raphael("floor", 640, 480);
-    };
-    floorDiagram.clear();
-    /*
-    workCenters = [];
-    workCenterShapes = [];
-    products = [];
-    productShapes = [];
-    */
-    products = [
-      {
-        id: "7a5041e6-8f92-4bf6-b962-9f75bf9c070d",
-        name: "blade",
-        loc: [100,200],
-      },
-      {
-        id: "eaef65f2-0369-4d05-ace5-123e33486373",
-        name: "oslicense",
-        loc: [200,100],
-      },
-    ]
-    productShapes = [];
-    workCenters = [
-      {
-        id: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
-        inputs: ["blade", "oslicense"],
-        inputItems: ["7a5041e6-8f92-4bf6-b962-9f75bf9c070d", "eaef65f2-0369-4d05-ace5-123e33486373"],
-        outputs: ["blade w/ oslicense"],
-        loc: [200,200],
-      },
-      {
-        id: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
-        inputs: ["blade w/ oslicense"],
-        inputItems: ["4eb234b0-9ea4-45a7-82ec-3f7dd60db20a"],
-        outputs: ["blade w/ os installed"],
-        loc: [300,300],
-      },
-    ]
-    workCenterShapes = [];
-    floor = floorDiagram.rect( 0, 0, 640, 480);
-    drawProducts();
-    drawWorkCenters();
-    drawConnections();
-  }
-
   $scope.addWorkCenter = function() {
     workCenters.push({
       "wcname": "new wc " + Math.floor(Math.random()*10000 + 1),
     });
     workCenterShapes.push(
-      floorDiagram.rect(260, 220, 60, 40, 10)
+      floorDiagram.rect(260, 220, WORKCENTER.width, WORKCENTER.height, 10)
         .attr({
           fill: workCenterColor,
           stroke: workCenterColor,
@@ -209,6 +127,139 @@ kuihaoApp.controller('MainCtrl', function($scope) {
         })
         .drag(drag_move, drag_start)
     );
+  };
+
+  var stations = {
+    "7a5041e6-8f92-4bf6-b962-9f75bf9c070d": {
+      id: "7a5041e6-8f92-4bf6-b962-9f75bf9c070d",
+      name: "blade",
+      loc: [100,200],
+      type: "product",
+    },
+    "eaef65f2-0369-4d05-ace5-123e33486373": {
+      id: "eaef65f2-0369-4d05-ace5-123e33486373",
+      name: "oslicense",
+      loc: [200,100],
+      type: "product",
+    },
+    "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a": {
+      id: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
+      inputs: ["blade", "oslicense"],
+      outputs: ["blade w/ oslicense"],
+      loc: [200,200],
+      type: "workcenter",
+    },
+    "d8e5fa43-63d3-4228-9c93-ff1c64d2371b": {
+      id: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
+      inputs: ["blade w/ oslicense"],
+      outputs: ["blade w/ os installed"],
+      loc: [300,300],
+      type: "workcenter",
+    },
+  };
+  var stationShapes = [];
+  var connections = {
+    "7a5041e6-8f92-4bf6-b962-9f75bf9c070d|4eb234b0-9ea4-45a7-82ec-3f7dd60db20a" : {
+      source: "7a5041e6-8f92-4bf6-b962-9f75bf9c070d",
+      destination: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
+    },
+    "eaef65f2-0369-4d05-ace5-123e33486373|4eb234b0-9ea4-45a7-82ec-3f7dd60db20a" : {
+      source: "eaef65f2-0369-4d05-ace5-123e33486373",
+      destination: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
+    },
+    "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a|d8e5fa43-63d3-4228-9c93-ff1c64d2371b" : {
+      source: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
+      destination: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
+    },
+  };
+  var connectionShapes = [];
+
+  var redraw = function() {
+    if ((typeof floorDiagram === 'undefined') || (floorDiagram === null)) {
+      floorDiagram = Raphael("floor", WIDTH, HEIGHT);
+    };
+    floorDiagram.clear();
+    floor = floorDiagram.rect( 0, 0, WIDTH, HEIGHT);
+    stationShapes = [];
+    for (var stationId in stations) {
+      var station = stations[stationId];
+      switch (station.type) {
+        case "product":
+          stationShapes.push(
+            floorDiagram.circle(station.loc[0], station.loc[1], PRODUCT.width/2)
+              .attr({
+                fill: productColor,
+                stroke: productColor,
+                "fill-opacity": 1,
+                "stroke-width": 2,
+                "cursor" : "move",
+              })
+              .drag(drag_move, drag_start)
+              .data("station", station)
+          );
+          break;
+        case "workcenter":
+          stationShapes.push(
+            floorDiagram.rect(station.loc[0]-WORKCENTER.width/2, station.loc[1]-WORKCENTER.height/2, WORKCENTER.width, WORKCENTER.height, 5)
+              .attr({
+                fill: workCenterColor,
+                stroke: workCenterColor,
+                "fill-opacity": 1,
+                "stroke-width": 2,
+                "cursor" : "move",
+              })
+              .drag(drag_move, drag_start)
+              .hover(display_info, display_clear)
+              .data("station", station)
+          );
+          break;
+        default:
+          break;
+      };
+    };
+    connectionShapes = [];
+    for (var connectionId in connections) {
+      var connection = connections[connectionId];
+      var source = null;
+      if (stations[connection.source] !== undefined) {
+        source = stations[connection.source].loc;
+      };
+      var destination = null;
+      if (stations[connection.destination] !== undefined) {
+        destination = stations[connection.destination].loc;
+      };
+      if ((source !== null) && (destination !== null)) {
+        var pathStr = "M" + source + "L" + destination;
+        connectionShapes.push(
+          floorDiagram.path(pathStr)
+            .toBack()
+            .attr({
+              "stroke-width": 3,
+              "stroke": "#c0c0c0",
+            })
+            .data("connection", connection)
+        );
+        lastShape = connectionShapes[connectionShapes.length-1];
+        point = lastShape.getPointAtLength(lastShape.getTotalLength()/2);
+      };
+    };
+  };
+
+  var update_connections = function(station) {
+    for (var connectionShapeId in connectionShapes) {
+      var connectionShape = connectionShapes[connectionShapeId];
+      var connection = connectionShape.data("connection");
+      if ((connection.source == station.id) || (connection.destination == station.id)) {
+        var source = stations[connection.source].loc
+        var destination = stations[connection.destination].loc
+        var pathStr = "M" + source + "L" + destination;
+        connectionShape.attr({path: pathStr});
+      }
+    };
+  };
+
+  $scope.resetInit = function() {
+    redraw();
   };
 
 });

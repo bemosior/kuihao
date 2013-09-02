@@ -16,12 +16,15 @@
     </style>
   </head>
   <body ng-controller="MainCtrl" ng-init="resetInit()">
+    <h1>Procedure Layout</h1>
     <div id="floor"></div>
     <div id="actions">
-      <button ng-click="addWorkCenter()">Add Work Center</button>
-      <button ng-click="addProduct()">Add Product</button>
+      <button class="btn" ng-click="addWorkCenter()">Add Work Center</button><br/>
+      <button class="btn" ng-click="addProduct()">Add Product</button><br/>
     </div>
-    <div id="workcenterinfo">{{info}}</div>
+    <div id="workcenterinfo">
+      <h2>
+    </div>
     <script src="raphael-min.js"></script>
     <script src="angular.js"></script>
     <script src="app.js"></script>
