@@ -3,27 +3,39 @@
   <head>
     <title>Kuihao : Factory Floor Designer</title>
     <link rel="shortcut icon" href="about:blank">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen">
     <style>
 #floor {
   float: left;
 }
-#actions {
+#sidebar {
   float: left;
-}
-#workcenterinfo {
-  float: left;
+  width: 200px;
+  padding: 5px;
 }
     </style>
   </head>
   <body ng-controller="MainCtrl" ng-init="resetInit()">
     <h1>Procedure Layout</h1>
     <div id="floor"></div>
-    <div id="actions">
-      <button class="btn" ng-click="addWorkCenter()">Add Work Center</button><br/>
-      <button class="btn" ng-click="addProduct()">Add Product</button><br/>
-    </div>
-    <div id="workcenterinfo">
-      <h2>
+    <div id="sidebar" ng-switch="selected">
+      <button class="btn" style="width:100%;" ng-click="addWorkCenter()">Add Work Center</button><br/>
+      <button class="btn" style="width:100%;" ng-click="addProduct()">Add Product</button><br/>
+      <div ng-switch-when="product">
+        <h3 class="text-center">PRODUCT</h3>
+        <label>Name</label><text>{{station.name}}</text><br/>
+      </div>
+      <div ng-switch-when="workcenter">
+        <h3 class="text-center">WORKCENTER</h3>
+        <label>Name</label><text>{{station.name}}</text><br/>
+        <label>Inputs</label><text>{{station.inputs}}</text><br/>
+        <label>Outputs</label><text>{{station.outputs}}</text><br/>
+        <label>Machine</label><text>{{station.machine}}</text><br/>
+        <label>Method</label><text>{{station.method}}</text><br/>
+        <label>Man</label><text>{{station.man}}</text><br/>
+        <label>Measure</label><text>{{station.measure}}</text><br/>
+      </div>
+      <div ng-switch-default></div>
     </div>
     <script src="raphael-min.js"></script>
     <script src="angular.js"></script>

@@ -15,7 +15,7 @@ var kuihaoApp = angular.module('kuihaoApp', [], function() {
 kuihaoApp.controller('MainCtrl', function($scope) {
 
   var WIDTH = 800;
-  var HEIGHT = 600;
+  var HEIGHT = 300;
   var WORKCENTER = {
     height: 60,
     width: 60,
@@ -72,20 +72,39 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   };
 
   var display_info = function() {
-    switch (this.type) {
-      case "rect":
-        $scope.$apply(function($scope) {
-          $scope.info = "stuff!";
-        });
-        break;
-      default:
-        break;
+    if (this.data("station")) {
+      var station = this.data("station");
+      $scope.$apply(function($scope) {
+        var selected = null;
+        var statinfo = {};
+        switch (station.type) {
+          case "product":
+            selected = "product";
+            statinfo.name = station.name;
+            break;
+          case "workcenter":
+            selected = "workcenter";
+            statinfo.name = station.name;
+            statinfo.inputs = [].join(", ");
+            statinfo.outputs = [].join(", ");
+            statinfo.machine = "machine";
+            statinfo.method = "method";
+            statinfo.man = "man";
+            statinfo.measure = "measure";
+            break;
+        };
+        if (selected !== null) {
+          $scope.selected = selected;
+          $scope.station  = statinfo;
+        };
+      });
     };
   };
 
   var display_clear = function() {
     $scope.$apply(function($scope) {
-      $scope.info = "";
+      $scope.selected = "none";
+      $scope.station  = {};
     });
   };
 
@@ -141,17 +160,37 @@ kuihaoApp.controller('MainCtrl', function($scope) {
     },
     "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a": {
       id: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
+      name: "KVM/Remote Console",
       inputs: ["blade", "oslicense"],
       outputs: ["blade w/ oslicense"],
       loc: [200,200],
       type: "workcenter",
     },
+    "60c90afc-3ea1-405c-b3b9-abc25640e590": {
+      id: "60c90afc-3ea1-405c-b3b9-abc25640e590",
+      name: "blade w/ oslincense",
+      loc: [300, 200],
+      type: "product",
+    },
+    "5088cec1-f3d3-4fc8-9014-93cdf3247672": {
+      id: "5088cec1-f3d3-4fc8-9014-93cdf3247672",
+      name: "centrify license",
+      loc: [400, 100],
+      type: "product",
+    },
     "d8e5fa43-63d3-4228-9c93-ff1c64d2371b": {
       id: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
-      inputs: ["blade w/ oslicense"],
-      outputs: ["blade w/ os installed"],
-      loc: [300,300],
+      name: "adjoin",
+      inputs: ["blade w/ oslicense", "centrify license"],
+      outputs: ["blade w/ os installed, w/ centrify installed"],
+      loc: [400,200],
       type: "workcenter",
+    },
+    "f65e0589-afff-4942-ba2c-4feb72334a85": {
+      id: "f65e0589-afff-4942-ba2c-4feb72334a85",
+      name: "blade w/ os installed, w/ centrify installed",
+      loc: [500,200],
+      type: "product",
     },
   };
   var stationShapes = [];
@@ -164,10 +203,22 @@ kuihaoApp.controller('MainCtrl', function($scope) {
       source: "eaef65f2-0369-4d05-ace5-123e33486373",
       destination: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
     },
-    "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a|d8e5fa43-63d3-4228-9c93-ff1c64d2371b" : {
+    "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a|60c90afc-3ea1-405c-b3b9-abc25640e590" : {
       source: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
+      destination: "60c90afc-3ea1-405c-b3b9-abc25640e590",
+    },
+    "60c90afc-3ea1-405c-b3b9-abc25640e590|d8e5fa43-63d3-4228-9c93-ff1c64d2371b" : {
+      source: "60c90afc-3ea1-405c-b3b9-abc25640e590",
       destination: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
     },
+    "5088cec1-f3d3-4fc8-9014-93cdf3247672|d8e5fa43-63d3-4228-9c93-ff1c64d2371b" : {
+      source: "5088cec1-f3d3-4fc8-9014-93cdf3247672",
+      destination: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
+    },
+    "d8e5fa43-63d3-4228-9c93-ff1c64d2371b|f65e0589-afff-4942-ba2c-4feb72334a85" : {
+      source: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
+      destination: "f65e0589-afff-4942-ba2c-4feb72334a85",
+    }
   };
   var connectionShapes = [];
 
@@ -192,6 +243,7 @@ kuihaoApp.controller('MainCtrl', function($scope) {
                 "cursor" : "move",
               })
               .drag(drag_move, drag_start)
+              .hover(display_info, display_clear)
               .data("station", station)
           );
           break;
@@ -256,6 +308,7 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   };
 
   $scope.resetInit = function() {
+    $scope.selected = "none";
     redraw();
   };
 
