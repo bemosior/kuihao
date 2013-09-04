@@ -25,6 +25,9 @@ kuihaoApp.controller('MainCtrl', function($scope) {
     width: 40,
   };
 
+  var mode = "normal";
+  var selectedStation = null;
+
   var drag_move = function (dx, dy) {
     var att;
     var loc;
@@ -106,6 +109,32 @@ kuihaoApp.controller('MainCtrl', function($scope) {
       $scope.selected = "none";
       $scope.station  = {};
     });
+  };
+
+  var dblclick_enter = function() {
+    mode = "connect";
+    selectedStation = this.data("station");
+    redraw();
+  };
+
+  var dblclick_exit = function() {
+    mode = "normal";
+    selectedStation = null;;
+    redraw();
+  };
+
+  var click_connect = function() {
+    if (this.data("station") === selectedStation) return;
+    if (this.data("station").type == selectedStation.type) return;
+    var source = selectedStation;
+    var destination = this.data("station");
+    if (connections[source.id + "|" + destination.id] !== undefined) return;
+    if (connections[destination.id + "|" + source.id] !== undefined) return;
+    connections[source.id + "|" + destination.id] = {
+      source: source.id,
+      destination: destination.id,
+    };
+    redraw();
   };
 
   var floorDiagram;
@@ -207,18 +236,6 @@ kuihaoApp.controller('MainCtrl', function($scope) {
       source: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
       destination: "60c90afc-3ea1-405c-b3b9-abc25640e590",
     },
-    "60c90afc-3ea1-405c-b3b9-abc25640e590|d8e5fa43-63d3-4228-9c93-ff1c64d2371b" : {
-      source: "60c90afc-3ea1-405c-b3b9-abc25640e590",
-      destination: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
-    },
-    "5088cec1-f3d3-4fc8-9014-93cdf3247672|d8e5fa43-63d3-4228-9c93-ff1c64d2371b" : {
-      source: "5088cec1-f3d3-4fc8-9014-93cdf3247672",
-      destination: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
-    },
-    "d8e5fa43-63d3-4228-9c93-ff1c64d2371b|f65e0589-afff-4942-ba2c-4feb72334a85" : {
-      source: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
-      destination: "f65e0589-afff-4942-ba2c-4feb72334a85",
-    }
   };
   var connectionShapes = [];
 
@@ -242,10 +259,9 @@ kuihaoApp.controller('MainCtrl', function($scope) {
                 "stroke-width": 2,
                 "cursor" : "move",
               })
-              .drag(drag_move, drag_start)
-              .hover(display_info, display_clear)
               .data("station", station)
           );
+          station.shape = stationShapes[stationShapes.length-1];
           break;
         case "workcenter":
           stationShapes.push(
@@ -257,10 +273,9 @@ kuihaoApp.controller('MainCtrl', function($scope) {
                 "stroke-width": 2,
                 "cursor" : "move",
               })
-              .drag(drag_move, drag_start)
-              .hover(display_info, display_clear)
               .data("station", station)
           );
+          station.shape = stationShapes[stationShapes.length-1];
           break;
         default:
           break;
@@ -291,6 +306,48 @@ kuihaoApp.controller('MainCtrl', function($scope) {
         lastShape = connectionShapes[connectionShapes.length-1];
         point = lastShape.getPointAtLength(lastShape.getTotalLength()/2);
       };
+    };
+    setupMode();
+  };
+
+  var setupMode = function() {
+    stationShapes.forEach(function (stationShape) {
+      stationShape.attr({"cursor":"default"});
+      stationShape.undrag(drag_move, drag_start);
+      stationShape.unhover(display_info, display_clear);
+      stationShape.undblclick(dblclick_enter);
+      stationShape.undblclick(dblclick_exit);
+      stationShape.unclick(click_connect);
+    });
+    connectionShapes.forEach(function (connectionShape) {
+    });
+    switch (mode) {
+      case "normal":
+        stationShapes.forEach(function (stationShape) {
+          stationShape.drag(drag_move, drag_start);
+          stationShape.attr({"cursor":"move"});
+          stationShape.hover(display_info, display_clear);
+          stationShape.dblclick(dblclick_enter);
+        });
+        connectionShapes.forEach(function (connectionShape) {
+        });
+        break;
+      case "connect":
+        if (selectedStation !== null) {
+          selectedStation.shape.attr({
+            "stroke": "#daa520",
+            "stroke-width": 5,
+          });
+        };
+        stationShapes.forEach(function (stationShape) {
+          stationShape.attr({"cursor":"pointer"});
+          stationShape.hover(display_info, display_clear);
+          stationShape.dblclick(dblclick_exit);
+          stationShape.click(click_connect);
+        });
+        connectionShapes.forEach(function (connectionShape) {
+        });
+        break;
     };
   };
 
