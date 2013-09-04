@@ -123,6 +123,13 @@ kuihaoApp.controller('MainCtrl', function($scope) {
     redraw();
   };
 
+  var dblclick_remove = function() {
+    var connection = this.data("connection");
+    delete connections[connection.source + "|" + connection.destination];
+    this.remove();
+    redraw();
+  };
+
   var click_connect = function() {
     if (this.data("station") === selectedStation) return;
     if (this.data("station").type == selectedStation.type) return;
@@ -330,6 +337,8 @@ kuihaoApp.controller('MainCtrl', function($scope) {
           stationShape.dblclick(dblclick_enter);
         });
         connectionShapes.forEach(function (connectionShape) {
+          connectionShape.dblclick(dblclick_remove);
+          connectionShape.attr({"cursor":"not-allowed"});
         });
         break;
       case "connect":
