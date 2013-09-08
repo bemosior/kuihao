@@ -74,46 +74,59 @@ kuihaoApp.controller('MainCtrl', function($scope) {
     };
   };
 
-  var display_info = function() {
-    if (this.data("station")) {
-      var station = this.data("station");
+  var display_station = function(element) {
+    if (element.data("station")) {
+      var station = element.data("station");
       $scope.$apply(function($scope) {
-        var selected = null;
-        var statinfo = {};
-        switch (station.type) {
-          case "product":
-            selected = "product";
-            statinfo.name = station.name;
-            break;
-          case "workcenter":
-            selected = "workcenter";
-            statinfo.name = station.name;
-            statinfo.inputs = [].join(", ");
-            statinfo.outputs = [].join(", ");
-            statinfo.machine = "machine";
-            statinfo.method = "method";
-            statinfo.man = "man";
-            statinfo.measure = "measure";
-            break;
-        };
-        if (selected !== null) {
-          $scope.selected = selected;
-          $scope.station  = statinfo;
-        };
+        $scope.station = station;
+        $scope.displayed = station.type;
       });
     };
   };
 
   var display_clear = function() {
     $scope.$apply(function($scope) {
-      $scope.selected = "none";
-      $scope.station  = {};
+      $scope.displayed = "none";
+      $scope.station   = null;
     });
   };
 
+  var display_editstation = function() {
+    $scope.$apply(function($scope) {
+      $scope.displayed = "edit" + selectedStation.type;
+      $scope.station   = null; // use editStation instead
+    });
+  };
+
+  var hover_in = function() {
+    switch (mode) {
+      case "normal":
+        display_station(this);
+        break;
+      case "edit":
+        if (selectedStation !== this.data("station")) display_station(this);
+        break;
+    };
+  };
+
+  var hover_out = function() {
+    switch (mode) {
+      case "normal":
+        display_clear();
+        break;
+      case "edit":
+        display_editstation();
+        break;
+    };
+  };
+
   var dblclick_enter = function() {
-    mode = "connect";
+    mode = "edit";
     selectedStation = this.data("station");
+    $scope.$apply(function($scope) {
+      $scope.editstation = selectedStation;
+      $scope.displayed = "edit" + selectedStation.type;
+    });
     redraw();
   };
 
@@ -321,10 +334,10 @@ kuihaoApp.controller('MainCtrl', function($scope) {
     stationShapes.forEach(function (stationShape) {
       stationShape.attr({"cursor":"default"});
       stationShape.undrag(drag_move, drag_start);
-      stationShape.unhover(display_info, display_clear);
-      stationShape.undblclick(dblclick_enter);
-      stationShape.undblclick(dblclick_exit);
-      stationShape.unclick(click_connect);
+      stationShape.unhover(hover_in, hover_out);
+      //stationShape.undblclick(dblclick_enter);
+      //stationShape.undblclick(dblclick_exit);
+      //stationShape.unclick(click_connect);
     });
     connectionShapes.forEach(function (connectionShape) {
     });
@@ -333,7 +346,7 @@ kuihaoApp.controller('MainCtrl', function($scope) {
         stationShapes.forEach(function (stationShape) {
           stationShape.drag(drag_move, drag_start);
           stationShape.attr({"cursor":"move"});
-          stationShape.hover(display_info, display_clear);
+          stationShape.hover(hover_in, hover_out);
           stationShape.dblclick(dblclick_enter);
         });
         connectionShapes.forEach(function (connectionShape) {
@@ -341,7 +354,7 @@ kuihaoApp.controller('MainCtrl', function($scope) {
           connectionShape.attr({"cursor":"not-allowed"});
         });
         break;
-      case "connect":
+      case "edit":
         if (selectedStation !== null) {
           selectedStation.shape.attr({
             "stroke": "#daa520",
@@ -350,7 +363,9 @@ kuihaoApp.controller('MainCtrl', function($scope) {
         };
         stationShapes.forEach(function (stationShape) {
           stationShape.attr({"cursor":"pointer"});
-          stationShape.hover(display_info, display_clear);
+          if (stationShape.data("station") !== selectedStation) {
+            stationShape.hover(hover_in, hover_out);
+          };
           stationShape.dblclick(dblclick_exit);
           stationShape.click(click_connect);
         });
@@ -374,7 +389,7 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   };
 
   $scope.resetInit = function() {
-    $scope.selected = "none";
+    $scope.displayed = "none";
     redraw();
   };
 

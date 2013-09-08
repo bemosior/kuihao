@@ -10,7 +10,7 @@
 }
 #sidebar {
   float: left;
-  width: 200px;
+  width: 400px;
   padding: 5px;
 }
     </style>
@@ -18,22 +18,37 @@
   <body ng-controller="MainCtrl" ng-init="resetInit()">
     <h1>Procedure Layout</h1>
     <div id="floor"></div>
-    <div id="sidebar" ng-switch="selected">
+    <div id="sidebar" ng-switch="displayed">
       <button class="btn" style="width:100%;" ng-click="addWorkCenter()">Add Work Center</button><br/>
       <button class="btn" style="width:100%;" ng-click="addProduct()">Add Product</button><br/>
+      {{displayed}}
       <div ng-switch-when="product">
         <h3 class="text-center">PRODUCT</h3>
-        <label>Name</label><text>{{station.name}}</text><br/>
+        <label>Name</label>{{station.name}}<br/>
+      </div>
+      <div ng-switch-when="editproduct">
+        <h3 class="text-center">PRODUCT</h3>
+        <label>Name</label><input id="station-name" class="edit" ng-model="editstation.name"/><br/>
       </div>
       <div ng-switch-when="workcenter">
         <h3 class="text-center">WORKCENTER</h3>
-        <label>Name</label><text>{{station.name}}</text><br/>
-        <label>Inputs</label><text>{{station.inputs}}</text><br/>
-        <label>Outputs</label><text>{{station.outputs}}</text><br/>
-        <label>Machine</label><text>{{station.machine}}</text><br/>
-        <label>Method</label><text>{{station.method}}</text><br/>
-        <label>Man</label><text>{{station.man}}</text><br/>
-        <label>Measure</label><text>{{station.measure}}</text><br/>
+        <span>Name</span>{{station.name}}<br/>
+        <span>Inputs</span>{{station.inputs}}<br/>
+        <span>Outputs</span>{{station.outputs}}<br/>
+        <span>Machine</span>{{station.machine}}<br/>
+        <span>Method</span>{{station.method}}<br/>
+        <span>Man</span>{{station.man}}<br/>
+        <span>Measure</span>{{station.measure}}<br/>
+      </div>
+      <div ng-switch-when="editworkcenter">
+        <h3 class="text-center">WORKCENTER</h3>
+        <span>Name</span><input id="station-name" class="edit" ng-model="editstation.name"/><br/>
+        <span>Inputs</span><input id="station-inputs" class="edit" ng-model="editstation.inputs"/><br/>
+        <span>Outputs</span><input id="station-outputs" class="edit" ng-model="editstation.outputs"/><br/>
+        <span>Machine</span><input id="station-machine" class="edit" ng-model="editstation.machine"/><br/>
+        <span>Method</span><input id="station-method" class="edit" ng-model="editstation.method"/><br/>
+        <span>Man</span><input id="station-man" class="edit" ng-model="editstation.man"/><br/>
+        <span>Measure</span><input id="station-measure" class="edit" ng-model="editstation.measure"/><br/>
       </div>
       <div ng-switch-default></div>
     </div>
