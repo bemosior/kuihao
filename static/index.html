@@ -21,7 +21,6 @@
     <div id="sidebar" ng-switch="displayed">
       <button class="btn" style="width:100%;" ng-click="addWorkCenter()">Add Work Center</button><br/>
       <button class="btn" style="width:100%;" ng-click="addProduct()">Add Product</button><br/>
-      {{displayed}}
       <div ng-switch-when="product">
         <h3 class="text-center">PRODUCT</h3>
         <label>Name</label>{{station.name}}<br/>
