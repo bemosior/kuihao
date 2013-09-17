@@ -36,37 +36,40 @@ kuihaoApp.controller('MainCtrl', function($scope) {
 
   var drag_move = function (dx, dy) {
     var att;
-    var loc;
-    switch (this.type) {
-      case "rect":
-        var nextx = this.ox + dx;
-        if (nextx < 0) nextx = 0;
-        if (nextx + WORKCENTER.width > WIDTH) nextx = WIDTH-WORKCENTER.width;
-        var nexty = this.oy + dy;
-        if (nexty < 0) nexty = 0;
-        if (nexty + WORKCENTER.height > HEIGHT) nexty = HEIGHT-WORKCENTER.height;
-        att = {x: nextx, y: nexty};
-        loc = [nextx+WORKCENTER.width/2, nexty+WORKCENTER.height/2];
+    var loc = [this.oloc[0] + dx, this.oloc[1] + dy];
+    switch (this.data("station").type) {
+      case "product":
+        if (loc[0] < PRODUCT.width/2) loc[0] = PRODUCT.width/2;
+        if (loc[0] + PRODUCT.width/2 > WIDTH) loc[0] = WIDTH-PRODUCT.width/2;
+        if (loc[1] < PRODUCT.height/2) loc[1] = PRODUCT.height/2;
+        if (loc[1] + PRODUCT.height/2 > HEIGHT) loc[1] = HEIGHT-PRODUCT.height/2;
         break;
-      case "circle":
-        var nextx = this.ox + dx;
-        if (nextx < PRODUCT.width/2) nextx = PRODUCT.width/2;
-        if (nextx + PRODUCT.width/2 > WIDTH) nextx = WIDTH-PRODUCT.width/2;
-        var nexty = this.oy + dy;
-        if (nexty < PRODUCT.height/2) nexty = PRODUCT.height/2;
-        if (nexty + PRODUCT.height/2 > HEIGHT) nexty = HEIGHT-PRODUCT.height/2;
-        att = {cx: nextx, cy: nexty};
-        loc = [nextx, nexty];
-        break;
-      default:
+      case "workcenter":
+        if (loc[0] < WORKCENTER.width/2) loc[0] = WORKCENTER.width/2;
+        if (loc[0] + WORKCENTER.width/2 > WIDTH) loc[0] = WIDTH-WORKCENTER.width/2;
+        if (loc[1] < WORKCENTER.height/2) loc[1] = WORKCENTER.height/2;
+        if (loc[1] + WORKCENTER.height/2 > HEIGHT) loc[1] = HEIGHT-WORKCENTER.height/2;
         break;
     };
-    this.attr(att);
     this.data("station").loc = loc;
+    this.data("set").forEach(function(el) {
+      switch (el.type) {
+        case "rect":
+          el.attr({ x: loc[0]-WORKCENTER.width/2, y: loc[1]-WORKCENTER.height/2 });
+          break;
+        case "circle":
+          el.attr({ cx: loc[0], cy: loc[1] });
+          break;
+        case "text":
+          el.attr({ x: loc[0], y: loc[1] });
+          break;
+      };
+    });
     update_connections(this.data("station"));
   };
 
   var drag_start = function() {
+    this.oloc = this.data("station").loc;
     switch (this.type) {
       case "rect":
         this.ox = this.attr("x");
@@ -212,32 +215,44 @@ kuihaoApp.controller('MainCtrl', function($scope) {
       var station = stations[stationId];
       switch (station.type) {
         case "product":
-          stationShapes.push(
-            floorDiagram.circle(station.loc[0], station.loc[1], PRODUCT.width/2)
-              .attr({
-                fill: productColor,
-                stroke: productColor,
-                "fill-opacity": 1,
-                "stroke-width": 2,
-                "cursor" : "move",
-              })
-              .data("station", station)
-          );
-          station.shape = stationShapes[stationShapes.length-1];
+          var set = floorDiagram.set();
+          var circle = floorDiagram.circle(station.loc[0], station.loc[1], PRODUCT.width/2)
+            .attr({
+              fill: productColor,
+              stroke: productColor,
+              "fill-opacity": 1,
+              "stroke-width": 2,
+              "cursor" : "move",
+            })
+            .data("set", set)
+            .data("station", station);
+          var label = floorDiagram.text(station.loc[0], station.loc[1], station.name)
+            .data("set", set)
+            .data("station", station);
+          set
+            .push(circle, label);
+          stationShapes.push(set);
+          station.shape = set;
           break;
         case "workcenter":
-          stationShapes.push(
-            floorDiagram.rect(station.loc[0]-WORKCENTER.width/2, station.loc[1]-WORKCENTER.height/2, WORKCENTER.width, WORKCENTER.height, 5)
-              .attr({
-                fill: workCenterColor,
-                stroke: workCenterColor,
-                "fill-opacity": 1,
-                "stroke-width": 2,
-                "cursor" : "move",
-              })
-              .data("station", station)
-          );
-          station.shape = stationShapes[stationShapes.length-1];
+          var set = floorDiagram.set();
+          var rect = floorDiagram.rect(station.loc[0]-WORKCENTER.width/2, station.loc[1]-WORKCENTER.height/2, WORKCENTER.width, WORKCENTER.height, 5)
+            .attr({
+              fill: workCenterColor,
+              stroke: workCenterColor,
+              "fill-opacity": 1,
+              "stroke-width": 2,
+              "cursor" : "move",
+            })
+            .data("set", set)
+            .data("station", station);
+          var label = floorDiagram.text(station.loc[0], station.loc[1], station.name)
+            .data("set", set)
+            .data("station", station);
+          set
+            .push(rect, label);
+          stationShapes.push(set);
+          station.shape = set;
           break;
         default:
           break;
