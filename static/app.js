@@ -313,9 +313,13 @@ kuihaoApp.controller('MainCtrl', function($scope) {
         break;
       case "edit":
         if (selectedStation !== null) {
-          selectedStation.shape.attr({
-            "stroke": "#daa520",
-            "stroke-width": 5,
+          selectedStation.shape.forEach(function (el) {
+            if (el.type !== "text") {
+              el.attr({
+                "stroke": "#daa520",
+                "stroke-width": 5,
+              });
+            };
           });
         };
         stationShapes.forEach(function (stationShape) {
