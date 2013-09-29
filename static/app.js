@@ -365,5 +365,56 @@ kuihaoApp.controller('MainCtrl', function($scope) {
 });
 
 kuihaoApp.controller('WorkCenterCtrl', function($scope) {
+
+  var WIDTH = 800;
+  var HEIGHT = 300;
+
+  var stations = sampledata.stations();
+  var centerinfo = stations["4eb234b0-9ea4-45a7-82ec-3f7dd60db20a"];
+  var workcenter = null;
+
+  var redraw = function() {
+    workcenter = Raphael("workcenter", WIDTH, HEIGHT);
+    workcenter.rect(WIDTH/2-20, 0, 40, HEIGHT, 0)
+      .attr({
+        fill: "#ccccff",
+        stroke: "#ccccff",
+      });
+    workcenter.text(400, 150, centerinfo.name)
+      .attr({
+        stroke: "#000000",
+      })
+      .transform("r-90");
+    centerinfo.inputs.forEach(function(input, i) {
+      workcenter.circle(250, 100+100*i, 30)
+        .attr({
+          fill: "#00cc00",
+          stroke: "#00cc00",
+	});
+      workcenter.text(250, 100+100*i, input);
+      workcenter.path("M" + [250,100+100*i] + "L" + [400,100+100*i])
+        .attr({
+          stroke: "#888888",
+	});
+    });
+    centerinfo.outputs.forEach(function(output,i) {
+      workcenter.circle(550, 80+100*i, 30)
+        .attr({
+          fill: "#00cc00",
+          stroke: "#00cc00",
+	});
+      workcenter.text(550, 80+100*i, output);
+      workcenter.path("M" + [550,80+100*i] + "L" + [400,80+100*i])
+        .attr({
+          stroke: "#888888",
+	});
+    });
+    console.log(centerinfo);
+  };
+
+  $scope.resetInit = function() {
+    redraw();
+  };
+
 });
 
