@@ -10,7 +10,15 @@ var generateUUID = function() {
 };
 
 var kuihaoApp = angular.module('kuihaoApp', [], function() {
-});
+})
+
+kuihaoApp.controller('PickCtrl', function($scope) {
+})
+  .config(['$routeProvider', function($routeProvider) {
+    $routeProvider
+      .when('/floor', {templateUrl: 'partials/floor.html', controller: 'MainCtrl'})
+      .when('/workcenter/:workcenterId', {templateUrl: 'partials/workcenter.html', controller: 'WorkCenterCtrl'});
+  }]);
 
 kuihaoApp.controller('MainCtrl', function($scope) {
 
@@ -355,3 +363,7 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   };
 
 });
+
+kuihaoApp.controller('WorkCenterCtrl', function($scope) {
+});
+
