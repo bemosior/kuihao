@@ -65,4 +65,27 @@ var sampledata = {
       },
     };
   },
+  workcenterinfo : function() {
+    return {
+      "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a": {
+        id: "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",
+        name: "KVM/Remote Console",
+        products: [
+          {
+            name: 'Host',
+            type: 'modified',
+            change: '+os',
+          },
+          {
+            name: 'OS License',
+            type: 'input',
+          },
+          {
+            name: "Waste",
+            type: "output",
+          },
+        ],
+      },
+    };
+  },
 };

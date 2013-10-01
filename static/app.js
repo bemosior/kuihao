@@ -369,8 +369,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
   var WIDTH = 800;
   var HEIGHT = 300;
 
-  var stations = sampledata.stations();
-  var centerinfo = stations["4eb234b0-9ea4-45a7-82ec-3f7dd60db20a"];
+  var centerinfo = sampledata.workcenterinfo()["4eb234b0-9ea4-45a7-82ec-3f7dd60db20a"];
   var workcenter = null;
 
   var redraw = function() {
@@ -385,31 +384,55 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
         stroke: "#000000",
       })
       .transform("r-90");
-    centerinfo.inputs.forEach(function(input, i) {
-      workcenter.circle(250, 100+100*i, 30)
-        .attr({
-          fill: "#00cc00",
-          stroke: "#00cc00",
-	});
-      workcenter.text(250, 100+100*i, input);
-      workcenter.path("M" + [250,100+100*i] + "L" + [400,100+100*i])
-        .attr({
-          stroke: "#888888",
-	});
+    centerinfo.products.forEach(function(product, i) {
+      switch (product.type) {
+        case "modified":
+          workcenter.circle(250, 50+100*i, 30)
+            .attr({
+              fill: "#00cc00",
+              stroke: "#00cc00",
+            });
+          workcenter.text(250, 50+100*i, product.name);
+          workcenter.circle(550, 50+100*i, 30)
+            .attr({
+              fill: "#00cc00",
+              stroke: "#00cc00",
+            });
+          workcenter.text(550, 50+100*i, product.name + "\n" + product.change);
+          workcenter.path("M" + [250,50+100*i] + "L" + [550, 50+100*i])
+            .attr({
+              stroke: "#888888",
+            })
+            .toBack();
+          break;
+        case "input":
+          workcenter.circle(250, 50+100*i, 30)
+            .attr({
+              fill: "#00cc00",
+              stroke: "#00cc00",
+            });
+          workcenter.text(250, 50+100*i, product.name);
+          workcenter.path("M" + [250,50+100*i] + "L" + [400, 50+100*i])
+            .attr({
+              stroke: "#888888",
+            })
+            .toBack();
+          break;
+        case "output":
+          workcenter.circle(550, 50+100*i, 30)
+            .attr({
+              fill: "#00cc00",
+              stroke: "#00cc00",
+            });
+          workcenter.text(550, 50+100*i, product.name);
+          workcenter.path("M" + [400,50+100*i] + "L" + [550, 50+100*i])
+            .attr({
+              stroke: "#888888",
+            })
+            .toBack();
+          break;
+      };
     });
-    centerinfo.outputs.forEach(function(output,i) {
-      workcenter.circle(550, 80+100*i, 30)
-        .attr({
-          fill: "#00cc00",
-          stroke: "#00cc00",
-	});
-      workcenter.text(550, 80+100*i, output);
-      workcenter.path("M" + [550,80+100*i] + "L" + [400,80+100*i])
-        .attr({
-          stroke: "#888888",
-	});
-    });
-    console.log(centerinfo);
   };
 
   $scope.resetInit = function() {
