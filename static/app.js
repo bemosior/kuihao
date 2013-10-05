@@ -387,49 +387,54 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
     centerinfo.products.forEach(function(product, i) {
       switch (product.type) {
         case "modified":
-          workcenter.circle(250, 50+100*i, 30)
+          workcenter.rect(200, 30+50*i, 100, 30)
             .attr({
               fill: "#00cc00",
               stroke: "#00cc00",
             });
-          workcenter.text(250, 50+100*i, product.name);
-          workcenter.circle(550, 50+100*i, 30)
+          workcenter.text(250, 45+50*i, product.name);
+          workcenter.rect(500, 30+50*i, 100, 30)
             .attr({
               fill: "#00cc00",
               stroke: "#00cc00",
             });
-          workcenter.text(550, 50+100*i, product.name + "\n" + product.change);
-          workcenter.path("M" + [250,50+100*i] + "L" + [550, 50+100*i])
+          workcenter.text(550, 45+50*i, product.name + "\n" + product.change);
+          workcenter.path("M" + [300,45+50*i] + "L" + [500, 45+50*i])
             .attr({
               stroke: "#888888",
             })
             .toBack();
           break;
         case "input":
-          workcenter.circle(250, 50+100*i, 30)
+          workcenter.rect(200, 30+50*i, 100, 30)
             .attr({
               fill: "#00cc00",
               stroke: "#00cc00",
             });
-          workcenter.text(250, 50+100*i, product.name);
-          workcenter.path("M" + [250,50+100*i] + "L" + [400, 50+100*i])
+          workcenter.text(250, 45+50*i, product.name);
+          workcenter.path("M" + [250,45+50*i] + "L" + [400, 45+50*i])
             .attr({
               stroke: "#888888",
             })
             .toBack();
           break;
         case "output":
-          workcenter.circle(550, 50+100*i, 30)
+          workcenter.rect(500, 30+50*i, 100,30)
             .attr({
               fill: "#00cc00",
               stroke: "#00cc00",
             });
-          workcenter.text(550, 50+100*i, product.name);
-          workcenter.path("M" + [400,50+100*i] + "L" + [550, 50+100*i])
+          workcenter.text(550, 45+50*i, product.name);
+          var l = workcenter.path("M" + [420,45+50*i] + "L" + [500, 45+50*i])
             .attr({
               stroke: "#888888",
             })
             .toBack();
+          var m = l.getPointAtLength(l.getTotalLength()/2);
+          console.log(l.getTotalLength());
+          console.log(l.getPointAtLength(l.getTotalLength()));
+          var midpoint = workcenter.path("M0,-5L5,5L-5,5Z").transform("t" + [m.x,m.y] + "r90").attr({stroke: "#000000"});
+          console.log(midpoint);
           break;
       };
     });

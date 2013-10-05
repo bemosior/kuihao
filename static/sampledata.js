@@ -84,6 +84,15 @@ var sampledata = {
             name: "Waste",
             type: "output",
           },
+          {
+            name: "mac1",
+            type: "input",
+          },
+          {
+            name: "mac2",
+            type: "modified",
+            change: "+foo",
+          }
         ],
       },
     };
