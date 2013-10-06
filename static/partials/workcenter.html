@@ -26,18 +26,18 @@
       <div class="well">
         <form class="form-horizontal" role="form">
           <label for="resourceName1">Name</label>
-          <input type="text" class="form-control" id="resourceName1" ng-model="resource.name"/>
+          <input type="text" class="form-control" id="resourceName1" ng-model="resource.name" ng-disabled="!selectedMode()"/>
           <br/>
 
           <label for="resourceType1">Type</label>
-          <select class="form-control input-sm" ng-model="resource.type">
+          <select class="form-control input-sm" ng-model="resource.type" ng-disabled="!selectedMode()">
             <option value="input">Input</option>
             <option value="output">Output</option>
             <option value="modified">Modified</option>
           </select>
           <br/>
           <label for="resourceMod1">Modification</label>
-          <input type="text" class="form-control" id="resourceMod1" ng-model="resource.modification" ng-disabled="resource.type != 'modified'"/>
+          <input type="text" class="form-control" id="resourceMod1" ng-model="resource.change" ng-disabled="!selectedMode() && (resource.type != 'modified')"/>
           <br/>
         </form>
       </div>

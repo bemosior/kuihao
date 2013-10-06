@@ -382,7 +382,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
       if (resource == null) {
         $scope.resource = {};
       } else {
-        $scope.resource = resource;
+        $scope.resource = selectedResource;
       };
     });
   };
@@ -412,19 +412,21 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
       case "normal":
         mode = "selected";
         selectedResource = this.data("product");
+        $scope.resource = selectedResource;
         break;
       case "selected":
         if (selectedResource == this.data("product")) {
           mode = "normal";
           selectedResource = null;
+          $scope.resource = {};
         };
         break;
     };
     redraw();
+    $scope.$digest();
   };
 
   var redraw = function() {
-    $scope.resource = { "name": "mac", "type": "output" };
     if (workcenter != null) {
       workcenter.clear();
     } else {
@@ -526,7 +528,15 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
     });
   };
 
+  $scope.selectedMode = function() {
+    return (mode == "selected");
+  };
+
   $scope.resetInit = function() {
+    $scope.resource = {};
+    $scope.$watch('resource.name', function(n,o) { redraw() });
+    $scope.$watch('resource.type', function(n,o) { redraw() });
+    $scope.$watch('resource.change', function(n,o) { redraw() });
     redraw();
   };
 
