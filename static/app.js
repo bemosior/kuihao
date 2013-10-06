@@ -367,13 +367,20 @@ kuihaoApp.controller('MainCtrl', function($scope) {
 kuihaoApp.controller('WorkCenterCtrl', function($scope) {
 
   var WIDTH = 800;
-  var HEIGHT = 300;
+  var HEIGHT = 450;
 
   var centerinfo = sampledata.workcenterinfo()["4eb234b0-9ea4-45a7-82ec-3f7dd60db20a"];
   var workcenter = null;
 
+  $scope.name = centerinfo.name;
+
   var redraw = function() {
-    workcenter = Raphael("workcenter", WIDTH, HEIGHT);
+    $scope.resource = { "name": "mac", "type": "output" };
+    if (workcenter != null) {
+      workcenter.clear();
+    } else {
+      workcenter = Raphael("workcenter", WIDTH, HEIGHT);
+    }
     workcenter.rect(WIDTH/2-20, 0, 40, HEIGHT, 0)
       .attr({
         fill: "#ccccff",
@@ -431,10 +438,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
             })
             .toBack();
           var m = l.getPointAtLength(l.getTotalLength()/2);
-          console.log(l.getTotalLength());
-          console.log(l.getPointAtLength(l.getTotalLength()));
           var midpoint = workcenter.path("M0,-5L5,5L-5,5Z").transform("t" + [m.x,m.y] + "r90").attr({stroke: "#000000"});
-          console.log(midpoint);
           break;
       };
     });

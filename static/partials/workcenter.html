@@ -1,7 +1,55 @@
 
-<div ng-controller="WorkCenterCtrl" ng-init="resetInit()">
+<div ng-controller="WorkCenterCtrl" ng-init="resetInit()" style="padding-top: 60px">
 
-  <h1>Workcenter Edit</h1>
-  <div id="workcenter"></div>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <a class="brand">WorkCenter Construction : {{name}}</a>
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span3">
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">File</li>
+          <li><a href="#">Close</a></li>
+          <li><a href="#">Save</a></li>
+        </ul>
+      </div>
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class=""><a>Add Resource</a></li>
+          <li class=""><a>Delete Resource</a></li>
+        </ul>
+      </div>
+      <div class="well">
+        <form class="form-horizontal" role="form">
+          <label for="resourceName1">Name</label>
+          <input type="text" class="form-control" id="resourceName1" ng-model="resource.name"/>
+          <br/>
+
+          <label for="resourceType1">Type</label>
+          <select class="form-control input-sm" ng-model="resource.type">
+            <option value="input">Input</option>
+            <option value="output">Output</option>
+            <option value="modified">Modified</option>
+          </select>
+          <br/>
+          <label for="resourceMod1">Modification</label>
+          <input type="text" class="form-control" id="resourceMod1" ng-model="resource.modification" ng-disabled="resource.type != 'modified'"/>
+          <br/>
+        </form>
+      </div>
+    </div>
+    <div class="span9">
+      <div id="workcenter"></div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span12 well">
+STEPS!
+    </div>
+  </div>
 
 </div>
