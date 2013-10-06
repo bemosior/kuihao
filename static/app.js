@@ -448,5 +448,17 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
     redraw();
   };
 
+  $scope.addResource = function() {
+    console.log("FOO");
+    centerinfo.products.push({
+      name: "New Product",
+      type: "input",
+    });
+    redraw();
+  };
+
+  $scope.deleteResource = function() {
+  };
+
 });
 
