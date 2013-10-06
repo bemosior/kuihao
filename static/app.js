@@ -372,7 +372,56 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
   var centerinfo = sampledata.workcenterinfo()["4eb234b0-9ea4-45a7-82ec-3f7dd60db20a"];
   var workcenter = null;
 
+  var mode = "normal";
+  var selectedResource = null;
+
   $scope.name = centerinfo.name;
+
+  var display_resource = function(resource) {
+    $scope.$apply(function($scope) {
+      if (resource == null) {
+        $scope.resource = {};
+      } else {
+        $scope.resource = resource;
+      };
+    });
+  };
+
+  var hover_in = function() {
+    switch (mode) {
+      case "normal":
+        display_resource(this.data("product"));
+        break;
+      case "selected":
+        break;
+    };
+  };
+
+  var hover_out = function() {
+    switch (mode) {
+      case "normal":
+        display_resource(null);
+        break;
+      case "selected":
+        break;
+    };
+  };
+
+  var click = function() {
+    switch (mode) {
+      case "normal":
+        mode = "selected";
+        selectedResource = this.data("product");
+        break;
+      case "selected":
+        if (selectedResource == this.data("product")) {
+          mode = "normal";
+          selectedResource = null;
+        };
+        break;
+    };
+    redraw();
+  };
 
   var redraw = function() {
     $scope.resource = { "name": "mac", "type": "output" };
@@ -392,20 +441,29 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
       })
       .transform("r-90");
     centerinfo.products.forEach(function(product, i) {
+      var productShapes = [];
       switch (product.type) {
         case "modified":
-          workcenter.rect(200, 30+50*i, 100, 30)
-            .attr({
-              fill: "#00cc00",
-              stroke: "#00cc00",
-            });
-          workcenter.text(250, 45+50*i, product.name);
-          workcenter.rect(500, 30+50*i, 100, 30)
-            .attr({
-              fill: "#00cc00",
-              stroke: "#00cc00",
-            });
-          workcenter.text(550, 45+50*i, product.name + "\n" + product.change);
+          productShapes.push(
+            workcenter.rect(200, 30+50*i, 100, 30)
+              .attr({
+                fill: "#00cc00",
+                stroke: "#00cc00",
+              })
+          );
+          productShapes.push(
+            workcenter.text(250, 45+50*i, product.name)
+          );
+          productShapes.push(
+            workcenter.rect(500, 30+50*i, 100, 30)
+              .attr({
+                fill: "#00cc00",
+                stroke: "#00cc00",
+              })
+          );
+          productShapes.push(
+            workcenter.text(550, 45+50*i, product.name + "\n" + product.change)
+          );
           workcenter.path("M" + [300,45+50*i] + "L" + [500, 45+50*i])
             .attr({
               stroke: "#888888",
@@ -413,12 +471,16 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
             .toBack();
           break;
         case "input":
-          workcenter.rect(200, 30+50*i, 100, 30)
-            .attr({
-              fill: "#00cc00",
-              stroke: "#00cc00",
-            });
-          workcenter.text(250, 45+50*i, product.name);
+          productShapes.push(
+            workcenter.rect(200, 30+50*i, 100, 30)
+              .attr({
+                fill: "#00cc00",
+                stroke: "#00cc00",
+              })
+          );
+          productShapes.push(
+            workcenter.text(250, 45+50*i, product.name)
+          );
           workcenter.path("M" + [250,45+50*i] + "L" + [400, 45+50*i])
             .attr({
               stroke: "#888888",
@@ -426,12 +488,16 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
             .toBack();
           break;
         case "output":
-          workcenter.rect(500, 30+50*i, 100,30)
-            .attr({
-              fill: "#00cc00",
-              stroke: "#00cc00",
-            });
-          workcenter.text(550, 45+50*i, product.name);
+          productShapes.push(
+            workcenter.rect(500, 30+50*i, 100,30)
+              .attr({
+                fill: "#00cc00",
+                stroke: "#00cc00",
+              })
+          );
+          productShapes.push(
+            workcenter.text(550, 45+50*i, product.name)
+          );
           var l = workcenter.path("M" + [420,45+50*i] + "L" + [500, 45+50*i])
             .attr({
               stroke: "#888888",
@@ -441,6 +507,22 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
           var midpoint = workcenter.path("M0,-5L5,5L-5,5Z").transform("t" + [m.x,m.y] + "r90").attr({stroke: "#000000"});
           break;
       };
+      productShapes.forEach(function(productShape) {
+        if (mode == "selected") {
+          if (selectedResource == product) {
+            if (productShape.type == "rect") {
+              productShape.attr({
+                "stroke-width": 5,
+                "stroke": "#daa520",
+              });
+            };
+          };
+        };
+        productShape
+          .hover(hover_in, hover_out)
+          .click(click)
+          .data("product", product);
+      });
     });
   };
 
@@ -449,7 +531,6 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
   };
 
   $scope.addResource = function() {
-    console.log("FOO");
     centerinfo.products.push({
       name: "New Product",
       type: "input",
@@ -458,6 +539,17 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
   };
 
   $scope.deleteResource = function() {
+    switch (mode) {
+      case "selected":
+        var index = centerinfo.products.indexOf(selectedResource);
+        if (index > -1) {
+          centerinfo.products.splice(index, 1);
+        };
+        mode = "normal";
+        selectedResource = null;
+        break;
+    };
+    redraw();
   };
 
 });
