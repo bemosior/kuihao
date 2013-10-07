@@ -26,7 +26,7 @@ kuihaoApp.controller('PickCtrl', function($scope) {
 kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
 
   var WIDTH = 800;
-  var HEIGHT = 300;
+  var HEIGHT = 450;
   var WORKCENTER = {
     height: 60,
     width: 60,

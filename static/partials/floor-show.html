@@ -1,40 +1,73 @@
 
-<div ng-controller="MainCtrl" ng-init="resetInit()">
+<div ng-controller="MainCtrl" ng-init="resetInit()" style="padding-top: 60px">
 
-    <h1>Procedure Layout</h1>
-    <div id="floor"></div>
-    <div id="sidebar" ng-switch="displayed">
-      <button class="btn" style="width:100%;" ng-click="addWorkCenter()">Add Work Center</button><br/>
-      <button class="btn" style="width:100%;" ng-click="addProduct()">Add Product</button><br/>
-      <div ng-switch-when="product">
-        <h3 class="text-center">PRODUCT</h3>
-        <label>Name</label>{{station.name}}<br/>
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <a class="brand">Floor Construction : NAME</a>
       </div>
-      <div ng-switch-when="editproduct">
-        <h3 class="text-center">PRODUCT</h3>
-        <label>Name</label><input id="station-name" class="edit" ng-model="editstation.name"/><br/>
-      </div>
-      <div ng-switch-when="workcenter">
-        <h3 class="text-center">WORKCENTER</h3>
-        <span>Name</span>{{station.name}}<br/>
-        <span>Inputs</span>{{station.inputs}}<br/>
-        <span>Outputs</span>{{station.outputs}}<br/>
-        <span>Machine</span>{{station.machine}}<br/>
-        <span>Method</span>{{station.method}}<br/>
-        <span>Man</span>{{station.man}}<br/>
-        <span>Measure</span>{{station.measure}}<br/>
-      </div>
-      <div ng-switch-when="editworkcenter">
-        <h3 class="text-center">WORKCENTER</h3>
-        <span>Name</span><input id="station-name" class="edit" ng-model="editstation.name"/><br/>
-        <span>Inputs</span><input id="station-inputs" class="edit" ng-model="editstation.inputs"/><br/>
-        <span>Outputs</span><input id="station-outputs" class="edit" ng-model="editstation.outputs"/><br/>
-        <span>Machine</span><input id="station-machine" class="edit" ng-model="editstation.machine"/><br/>
-        <span>Method</span><input id="station-method" class="edit" ng-model="editstation.method"/><br/>
-        <span>Man</span><input id="station-man" class="edit" ng-model="editstation.man"/><br/>
-        <span>Measure</span><input id="station-measure" class="edit" ng-model="editstation.measure"/><br/>
-      </div>
-      <div ng-switch-default></div>
     </div>
+  </div>
+
+  <div class="row-fluid">
+
+    <div class="span3">
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">List</li>
+          <li><a href="#/workcenter">Work Centers</a></li>
+          <li><a href="#/floor">Work Floors</a></li>
+          <li class="nav-header">File - Floor</li>
+          <li><a href="#/floor">Close</a></li>
+          <li><a ng-click="save()">Save</a></li>
+          <li><a ng-click="download()">Download</a></li>
+          <li><a ng-click="delete()">Delete</a></li>
+        </ul>
+      </div>
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class=""><a ng-click="addWorkCenter()">Add Work Center</a></li>
+          <li class=""><a ng-click="addProduct()">Add Product</a></li>
+        </ul>
+      </div>
+
+      <div class="well" ng-switch="displayed">
+        <div ng-switch-when="product">
+          <h3>Product</h3>
+          <form class="form-horizontal" role="form">
+            <label for="productName1">Name</label">
+            <input type="text" class="form-control" id="productName1" ng-model="station.name" ng-disabled="true"/>
+          </form>
+        </div>
+        <div ng-switch-when="editproduct">
+          <h3>Product</h3>
+          <form class="form-horizontal" role="form">
+            <label for="productName1">Name</label">
+            <input type="text" class="form-control" id="productName1" ng-model="editstation.name" ng-disabled="false"/>
+          </form>
+        </div>
+        <div ng-switch-when="workcenter">
+          <h3>Work Center</h3>
+          <label for="workcenterName1">Name</label>
+          <input type="text" class="form-control" id="workcenterName1" ng-model="editstation.name" ng-disabled="true"/>
+        </div>
+        <div ng-switch-when="editworkcenter">
+          <h3>Work Center</h3>
+          <label for="workcenterName1">Name</label>
+          <input type="text" class="form-control" id="workcenterName1" ng-model="editstation.name" ng-disabled="false"/>
+        </div>
+        <div ng-switch-default>
+          <h3>None Selected</h3>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="span9">
+      <div id="floor"></div>
+    </div>
+
+  </div>
+
 
 </div>
