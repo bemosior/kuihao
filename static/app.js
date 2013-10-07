@@ -17,7 +17,10 @@ kuihaoApp.controller('PickCtrl', function($scope) {
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/floor', {templateUrl: 'partials/floor.html', controller: 'MainCtrl'})
-      .when('/workcenter/:workcenterId', {templateUrl: 'partials/workcenter.html', controller: 'WorkCenterCtrl'});
+      .when('/floor/floorId', {templateUrl: 'partials/floor.html', controller: 'MainCtrl'})
+      .when('/workcenter', {templateUrl: 'partials/workcenter-list.html', controller: 'WorkCenterCtrl'})
+      .when('/workcenter/:workcenterId', {templateUrl: 'partials/workcenter-show.html', controller: 'WorkCenterCtrl'})
+    ;
   }]);
 
 kuihaoApp.controller('MainCtrl', function($scope) {
@@ -364,18 +367,15 @@ kuihaoApp.controller('MainCtrl', function($scope) {
 
 });
 
-kuihaoApp.controller('WorkCenterCtrl', function($scope) {
+kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams) {
 
   var WIDTH = 800;
   var HEIGHT = 450;
 
-  var centerinfo = sampledata.workcenterinfo()["4eb234b0-9ea4-45a7-82ec-3f7dd60db20a"];
+  var centerinfo = null;
   var workcenter = null;
-
   var mode = "normal";
   var selectedResource = null;
-
-  $scope.name = centerinfo.name;
 
   var display_resource = function(resource) {
     $scope.$apply(function($scope) {
@@ -533,6 +533,8 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope) {
   };
 
   $scope.resetInit = function() {
+    centerinfo = sampledata.workcenterinfo()[$routeParams.workcenterId];
+    $scope.name = centerinfo.name;
     $scope.resource = {};
     $scope.$watch('resource.name', function(n,o) { redraw() });
     $scope.$watch('resource.type', function(n,o) { redraw() });
