@@ -185,9 +185,8 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
 
   var state = "normal";
 
-  var workCenterColor  = Raphael.getColor();
-  Raphael.getColor(); Raphael.getColor(); Raphael.getColor();
-  var productColor     = Raphael.getColor();
+  var workCenterColor  = "#bf6b26";
+  var productColor     = "#26bf4c";
 
   $scope.addWorkCenter = function() {
     var uuid = generateUUID();
