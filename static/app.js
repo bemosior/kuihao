@@ -533,13 +533,23 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams)
   };
 
   $scope.resetInit = function() {
-    centerinfo = sampledata.workcenterinfo()[$routeParams.workcenterId];
-    $scope.name = centerinfo.name;
-    $scope.resource = {};
-    $scope.$watch('resource.name', function(n,o) { redraw() });
-    $scope.$watch('resource.type', function(n,o) { redraw() });
-    $scope.$watch('resource.change', function(n,o) { redraw() });
-    redraw();
+    if ($routeParams.workcenterId == null) {
+      //list
+      var centerList = []
+      for (var centerid in sampledata.workcenterinfo()) {
+        centerList.push({id: centerid, name: sampledata.workcenterinfo()[centerid].name});
+      };
+      $scope.centerList = centerList;
+    } else {
+      //show
+      centerinfo = sampledata.workcenterinfo()[$routeParams.workcenterId];
+      $scope.name = centerinfo.name;
+      $scope.resource = {};
+      $scope.$watch('resource.name', function(n,o) { redraw() });
+      $scope.$watch('resource.type', function(n,o) { redraw() });
+      $scope.$watch('resource.change', function(n,o) { redraw() });
+      redraw();
+    };
   };
 
   $scope.addResource = function() {

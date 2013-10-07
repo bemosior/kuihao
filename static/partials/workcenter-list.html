@@ -1,0 +1,35 @@
+
+<div ng-controller="WorkCenterCtrl" ng-init="resetInit()" style="padding-top: 60px">
+
+  <div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+      <div class="container-fluid">
+        <a class="brand">WorkCenter List</a>
+      </div>
+    </div>
+  </div>
+  <div class="row-fluid">
+    <div class="span3">
+      <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">List</li>
+          <li><a href="#/workcenter">Work Centers</a></li>
+          <li><a href="#/floor">Work Floors</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="span9">
+      <table class="table table-striped">
+        <thead><tr><th>#</th><th>Name</th><th>ID</th></tr></thead>
+        <tbody>
+          <tr ng-repeat="workcenter in centerList">
+            <td>{{$index+1}}</td>
+            <td><a href="#/workcenter/{{workcenter.id}}">{{workcenter.name}}</a></td>
+            <td><a href="#/workcenter/{{workcenter.id}}">{{workcenter.id}}</a></td>
+          </tr>
+        </tbody>
+      <table>
+    </div>
+  </div>
+
+</div>
