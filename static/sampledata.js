@@ -2,6 +2,7 @@ var sampledata = {
   floorinfo : function() {
     return {
       "222d49c0-2ef7-11e3-aa6e-0800200c9a66": {
+        name: "Blade Build",
         stations: {
           "7a5041e6-8f92-4bf6-b962-9f75bf9c070d": {
             id: "7a5041e6-8f92-4bf6-b962-9f75bf9c070d",
