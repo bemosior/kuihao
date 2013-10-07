@@ -17,13 +17,13 @@ kuihaoApp.controller('PickCtrl', function($scope) {
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
       .when('/floor', {templateUrl: 'partials/floor.html', controller: 'MainCtrl'})
-      .when('/floor/floorId', {templateUrl: 'partials/floor.html', controller: 'MainCtrl'})
+      .when('/floor/:floorId', {templateUrl: 'partials/floor.html', controller: 'MainCtrl'})
       .when('/workcenter', {templateUrl: 'partials/workcenter-list.html', controller: 'WorkCenterCtrl'})
       .when('/workcenter/:workcenterId', {templateUrl: 'partials/workcenter-show.html', controller: 'WorkCenterCtrl'})
     ;
   }]);
 
-kuihaoApp.controller('MainCtrl', function($scope) {
+kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
 
   var WIDTH = 800;
   var HEIGHT = 300;
@@ -36,8 +36,8 @@ kuihaoApp.controller('MainCtrl', function($scope) {
     width: 40,
   };
 
-  var stations = sampledata.stations();
-  var connections = sampledata.connections();
+  var stations = null;
+  var connections = null;
 
   var stationShapes = [];
   var connectionShapes = [];
@@ -361,8 +361,15 @@ kuihaoApp.controller('MainCtrl', function($scope) {
   };
 
   $scope.resetInit = function() {
-    $scope.displayed = "none";
-    redraw();
+    if ($routeParams.floorId == null) {
+      //list
+    } else {
+      $scope.displayed = "none";
+      floorinfo = sampledata.floorinfo()[$routeParams.floorId];
+      stations = floorinfo.stations;
+      connections = floorinfo.connections;
+      redraw();
+    };
   };
 
 });
