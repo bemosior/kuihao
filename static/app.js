@@ -16,8 +16,8 @@ kuihaoApp.controller('PickCtrl', function($scope) {
 })
   .config(['$routeProvider', function($routeProvider) {
     $routeProvider
-      .when('/floor', {templateUrl: 'partials/floor.html', controller: 'MainCtrl'})
-      .when('/floor/:floorId', {templateUrl: 'partials/floor.html', controller: 'MainCtrl'})
+      .when('/floor', {templateUrl: 'partials/floor-list.html', controller: 'MainCtrl'})
+      .when('/floor/:floorId', {templateUrl: 'partials/floor-show.html', controller: 'MainCtrl'})
       .when('/workcenter', {templateUrl: 'partials/workcenter-list.html', controller: 'WorkCenterCtrl'})
       .when('/workcenter/:workcenterId', {templateUrl: 'partials/workcenter-show.html', controller: 'WorkCenterCtrl'})
     ;
@@ -363,6 +363,11 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
   $scope.resetInit = function() {
     if ($routeParams.floorId == null) {
       //list
+      var floorList = []
+      for (var floorId in sampledata.floorinfo()) {
+        floorList.push({id: floorId, name: sampledata.floorinfo()[floorId].name});
+      };
+      $scope.floorList = floorList;
     } else {
       $scope.displayed = "none";
       floorinfo = sampledata.floorinfo()[$routeParams.floorId];
