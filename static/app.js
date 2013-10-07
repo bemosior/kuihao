@@ -557,9 +557,9 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams)
       centerinfo = sampledata.workcenterinfo()[$routeParams.workcenterId];
       $scope.name = centerinfo.name;
       $scope.resource = {};
-      $scope.$watch('resource.name', function(n,o) { redraw() });
-      $scope.$watch('resource.type', function(n,o) { redraw() });
-      $scope.$watch('resource.change', function(n,o) { redraw() });
+      $scope.$watch('resource.name', function(n,o) { if (n!=o) redraw() });
+      $scope.$watch('resource.type', function(n,o) { if (n!=o) redraw() });
+      $scope.$watch('resource.change', function(n,o) { if (n!=o) redraw() });
       redraw();
     };
   };
