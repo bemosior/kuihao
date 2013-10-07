@@ -377,6 +377,18 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams)
   var mode = "normal";
   var selectedResource = null;
 
+  $scope.save = function() {
+    window.alert("Not implemented yet");
+  };
+
+  $scope.download = function() {
+    window.alert("Not implemented yet");
+  };
+
+  $scope.delete = function() {
+    window.alert("Not implemented yet");
+  };
+
   var display_resource = function(resource) {
     $scope.$apply(function($scope) {
       if (resource == null) {
