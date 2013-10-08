@@ -32,12 +32,13 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
     width: 60,
   };
   var PRODUCT = {
-    height: 40,
-    width: 40,
+    height: 60,
+    width: 60,
   };
 
   var stations = null;
   var connections = null;
+  var workcenterinfo = null;
 
   var stationShapes = [];
   var connectionShapes = [];
@@ -174,6 +175,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
       source: source.id,
       destination: destination.id,
     };
+    calculate_flow();
     redraw();
   };
 
@@ -213,7 +215,6 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
     redraw();
   };
 
-
   var redraw = function() {
     if ((typeof floorDiagram === 'undefined') || (floorDiagram === null)) {
       floorDiagram = Raphael("floor", WIDTH, HEIGHT);
@@ -236,7 +237,11 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
             })
             .data("set", set)
             .data("station", station);
-          var label = floorDiagram.text(station.loc[0], station.loc[1], station.name)
+          var productlabel = station.name;
+          if (station.modified != 0) {
+            productlabel += "\n" + station.modified.join(",");
+          };
+          var label = floorDiagram.text(station.loc[0], station.loc[1], productlabel)
             .data("set", set)
             .data("station", station);
           set
@@ -256,7 +261,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
             })
             .data("set", set)
             .data("station", station);
-          var label = floorDiagram.text(station.loc[0], station.loc[1], station.name)
+          var label = floorDiagram.text(station.loc[0], station.loc[1], workcenterinfo[station.id].name)
             .data("set", set)
             .data("station", station);
           set
@@ -359,6 +364,36 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
     };
   };
 
+  var calculate_flow = function() {
+    floorinfo.flow.forEach(function(workcenterId) {
+      var inputs = [];
+      var inputNames = [];
+      var outputs = [];
+      var outputNames = [];
+      var workcenter = workcenterinfo[workcenterId];
+      for (var connectionId in connections) {
+        var connection = connections[connectionId];
+        if (workcenterId == connection.destination) {
+          inputs.push(stations[connection.source]);
+          inputNames.push(stations[connection.source].name);
+        } else
+        if (workcenterId == connection.source) {
+          outputs.push(stations[connection.destination]);
+          outputNames.push(stations[connection.destination].name);
+        };
+      };
+      workcenter.products.forEach(function(product) {
+        if (product.type == "modified") {
+          var inputIdx = inputNames.indexOf(product.name);
+          var outputIdx = outputNames.indexOf(product.name);
+          if (inputIdx > -1 && outputIdx > -1) {
+            outputs[outputIdx].modified = inputs[outputIdx].modified.concat(product.change.replace("+",""));
+          };
+        };
+      });
+    });
+  };
+
   $scope.resetInit = function() {
     if ($routeParams.floorId == null) {
       //list
@@ -372,6 +407,8 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
       floorinfo = sampledata.floorinfo()[$routeParams.floorId];
       stations = floorinfo.stations;
       connections = floorinfo.connections;
+      workcenterinfo = sampledata.workcenterinfo();
+      calculate_flow();
       redraw();
     };
   };
