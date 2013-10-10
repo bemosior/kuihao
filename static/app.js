@@ -576,7 +576,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
   };
 
   $scope.save = function() {
-    window.alert("Not implemented yet");
+    WorkCenter.update(centerinfo);
   };
 
   $scope.download = function() {
