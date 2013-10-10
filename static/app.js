@@ -752,6 +752,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
       //show
       centerinfo = WorkCenter.fetch($routeParams.workcenterId);
       $scope.name = centerinfo.name;
+      $scope.$watch('name', function(n,o) { if (n!=o) { centerinfo.name=$scope.name; redraw() }; });
       $scope.resource = {};
       $scope.$watch('resource.name', function(n,o) { if (n!=o) redraw() });
       $scope.$watch('resource.type', function(n,o) { if (n!=o) redraw() });
