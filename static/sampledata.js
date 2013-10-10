@@ -2,6 +2,7 @@ var sampledata = {
   floorinfo : function() {
     return {
       "222d49c0-2ef7-11e3-aa6e-0800200c9a66": {
+        id: "222d49c0-2ef7-11e3-aa6e-0800200c9a66",
         name: "Blade Build",
         flow: [
           "4eb234b0-9ea4-45a7-82ec-3f7dd60db20a",

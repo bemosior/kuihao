@@ -64,6 +64,58 @@ kuihaoApp.service('WorkCenter', function() {
 
 });
 
+kuihaoApp.service('Floor', function() {
+
+  this.generateId = function() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+  };
+
+  this.list = function() {
+    var result = [];
+    var floorList = JSON.parse(localStorage.getItem('kuihao.floorlist'));
+    if (floorList == null) return [];
+    floorList.forEach(function(id) {
+      var floor = JSON.parse(localStorage.getItem('kuihao.floor.' + id));
+      result.push({
+        id: floor.id,
+        name: floor.name,
+      });
+    });
+    return result;
+  };
+
+  this.fetch = function(id) {
+    return JSON.parse(localStorage.getItem('kuihao.floor.' + id));
+  };
+
+  this.add = function(floor) {
+    var floorString = JSON.stringify(floor);
+    var floorList = JSON.parse(localStorage.getItem('kuihao.floorlist'));
+    if (floorList == null) floorList = [];
+    floorList.push(floor.id);
+    var floorList = JSON.stringify(floorList);
+    localStorage.setItem('kuihao.floor.' + floor.id, floorString);
+    localStorage.setItem('kuihao.floorlist', floorList);
+  };
+
+  this.update = function(floor) {
+    localStorage.setItem('kuihao.floor.' + floor.id, JSON.stringify(floor));
+    return floor;
+  };
+
+  this.remove = function(id) {
+    var floorList = JSON.parse(localStorage.getItem('kuihao.floor.' + id));
+    if (floorList == null) return;
+    var idx = floorList.indexOf(id);
+    if (idx>=0) {
+      floorList.splice(idx,1);
+      localStorage.removeItem('kuihao.floor.' + id);
+      localStorage.setItem('kuihao.floorlist', JSON.stringify(floorList));
+    };
+  };
+
+});
+
 kuihaoApp.controller('PickCtrl', function($scope) {
 })
   .config(['$routeProvider', function($routeProvider) {
@@ -75,7 +127,7 @@ kuihaoApp.controller('PickCtrl', function($scope) {
     ;
   }]);
 
-kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, WorkCenter) {
+kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $route, WorkCenter, Floor) {
 
   var WIDTH = 800;
   var HEIGHT = 450;
@@ -96,6 +148,16 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, WorkC
 
   var mode = "normal";
   var selectedStation = null;
+
+  $scope.loadSampleData = function() {
+    var sample = sampledata.floorinfo();
+    for (var floorId in sample) {
+      if (Floor.fetch(floorId) == null) {
+        Floor.add(sample[floorId]);
+      };
+    };
+    $route.reload();
+  };
 
   var drag_move = function (dx, dy) {
     var att;
@@ -468,13 +530,11 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, WorkC
     if ($routeParams.floorId == null) {
       //list
       var floorList = []
-      for (var floorId in sampledata.floorinfo()) {
-        floorList.push({id: floorId, name: sampledata.floorinfo()[floorId].name});
-      };
+      floorList = Floor.list();
       $scope.floorList = floorList;
     } else {
       $scope.displayed = "none";
-      floorinfo = sampledata.floorinfo()[$routeParams.floorId];
+      floorinfo = Floor.fetch($routeParams.floorId);
       stations = floorinfo.stations;
       connections = floorinfo.connections;
       $scope.centerList = WorkCenter.list();;
