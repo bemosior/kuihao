@@ -496,10 +496,10 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
   var selectedResource = null;
 
   $scope.loadSampleData = function() {
-    var centerinfo = sampledata.workcenterinfo();
-    for (var centerId in centerinfo) {
+    var sample = sampledata.workcenterinfo();
+    for (var centerId in sample) {
       if (WorkCenter.fetch(centerId) == null) {
-        WorkCenter.add(centerinfo[centerId]);
+        WorkCenter.add(sample[centerId]);
       };
     };
     $route.reload();
