@@ -75,7 +75,7 @@ kuihaoApp.controller('PickCtrl', function($scope) {
     ;
   }]);
 
-kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
+kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, WorkCenter) {
 
   var WIDTH = 800;
   var HEIGHT = 450;
@@ -90,7 +90,6 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
 
   var stations = null;
   var connections = null;
-  var workcenterinfo = null;
 
   var stationShapes = [];
   var connectionShapes = [];
@@ -248,7 +247,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
       window.alert("Already exists");
       return;
     };
-    stations[newWorkcenterId] = workcenterinfo[newWorkcenterId];
+    stations[newWorkcenterId] = WorkCenter.fetch(newWorkcenterId);
     stations[newWorkcenterId].loc = [WIDTH/2, HEIGHT/2];
     stations[newWorkcenterId].type = "workcenter";
     redraw();
@@ -332,7 +331,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
             })
             .data("set", set)
             .data("station", station);
-          var label = floorDiagram.text(station.loc[0], station.loc[1], workcenterinfo[station.id].name)
+          var label = floorDiagram.text(station.loc[0], station.loc[1], WorkCenter.fetch(station.id).name)
             .data("set", set)
             .data("station", station);
           set
@@ -441,7 +440,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
       var inputNames = [];
       var outputs = [];
       var outputNames = [];
-      var workcenter = workcenterinfo[workcenterId];
+      var workcenter = WorkCenter.fetch(workcenterId);
       for (var connectionId in connections) {
         var connection = connections[connectionId];
         if (workcenterId == connection.destination) {
@@ -478,15 +477,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
       floorinfo = sampledata.floorinfo()[$routeParams.floorId];
       stations = floorinfo.stations;
       connections = floorinfo.connections;
-      workcenterinfo = sampledata.workcenterinfo();
-      var centerList = [];
-      for (var centerId in workcenterinfo) {
-        centerList.push({
-          id: centerId,
-          name: workcenterinfo[centerId].name,
-        });
-      };
-      $scope.centerList = centerList;
+      $scope.centerList = WorkCenter.list();;
       calculate_flow();
       redraw();
     };
