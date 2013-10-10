@@ -26,8 +26,18 @@
       </div>
       <div class="well sidebar-nav">
         <ul class="nav nav-list">
-          <li class=""><a ng-click="addWorkCenter()">Add Work Center</a></li>
-          <li class=""><a ng-click="addProduct()">Add Product</a></li>
+          <li class="">
+            <a ng-click="addWorkCenter()">Add WorkCenter:</a>
+            <select class="form-control input-sm" ng-model="addWorkCenterSelection">
+              <option ng-repeat="workcenter in centerList" value="{{workcenter.id}}">{{workcenter.name}}</option>
+            </select>
+          </li>
+          <li class="">
+            <a ng-click="addProduct()">Add Product:</a>
+            <select class="form-control input-sm">
+              <option vale="foo">Foo</option>
+            </select>
+          </li>
         </ul>
       </div>
 
@@ -44,17 +54,23 @@
           <form class="form-horizontal" role="form">
             <label for="productName1">Name</label">
             <input type="text" class="form-control" id="productName1" ng-model="editstation.name" ng-disabled="false"/>
+            <button class="btn" ng-click="deleteSelectedStation()">DELETE</button>
           </form>
         </div>
         <div ng-switch-when="workcenter">
           <h3>Work Center</h3>
-          <label for="workcenterName1">Name</label>
-          <input type="text" class="form-control" id="workcenterName1" ng-model="editstation.name" ng-disabled="true"/>
+          <form class="form-horizontal" role="form">
+            <label for="workcenterName1">Name</label>
+            <input type="text" class="form-control" id="workcenterName1" ng-model="editstation.name" ng-disabled="true"/>
+          </form>
         </div>
         <div ng-switch-when="editworkcenter">
           <h3>Work Center</h3>
-          <label for="workcenterName1">Name</label>
-          <input type="text" class="form-control" id="workcenterName1" ng-model="editstation.name" ng-disabled="false"/>
+          <form class="form-horizontal" role="form">
+            <label for="workcenterName1">Name</label>
+            <input type="text" class="form-control" id="workcenterName1" ng-model="editstation.name" ng-disabled="false"/>
+            <button class="btn" ng-click="deleteSelectedStation()">DELETE</button>
+          </form>
         </div>
         <div ng-switch-default>
           <h3>None Selected</h3>

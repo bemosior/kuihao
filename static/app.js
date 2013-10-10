@@ -191,15 +191,34 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
   var productColor     = "#26bf4c";
 
   $scope.addWorkCenter = function() {
-    var uuid = generateUUID();
-    var wc = {
-      id: uuid,
-      inputs: [],
-      outputs: [],
-      loc: [WIDTH/2, HEIGHT/2],
-      type: "workcenter",
+    var newWorkcenterId = $scope.addWorkCenterSelection;
+    if (stations[newWorkcenterId] != null) {
+      window.alert("Already exists");
+      return;
     };
-    stations[uuid] = wc;
+    stations[newWorkcenterId] = workcenterinfo[newWorkcenterId];
+    stations[newWorkcenterId].loc = [WIDTH/2, HEIGHT/2];
+    stations[newWorkcenterId].type = "workcenter";
+    redraw();
+  };
+
+  $scope.deleteSelectedStation = function() {
+    // remove the selected station
+    delete stations[selectedStation.id];
+    // clean up any lingering connections
+    var cleanup = []
+    for (connectionId in connections) {
+      if (connections[connectionId].source == selectedStation.id || connections[connectionId].destination == selectedStation.id) {
+        cleanup.push(connectionId);
+      };
+    };
+    cleanup.forEach(function(connectionId) {
+      delete connections[connectionId];
+    });
+    // reset mode, clear selection
+    selectedStation = null;
+    mode = "normal";
+    // redraw
     redraw();
   };
 
@@ -408,6 +427,14 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
       stations = floorinfo.stations;
       connections = floorinfo.connections;
       workcenterinfo = sampledata.workcenterinfo();
+      var centerList = [];
+      for (var centerId in workcenterinfo) {
+        centerList.push({
+          id: centerId,
+          name: workcenterinfo[centerId].name,
+        });
+      };
+      $scope.centerList = centerList;
       calculate_flow();
       redraw();
     };
