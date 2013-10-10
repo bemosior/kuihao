@@ -52,7 +52,7 @@ kuihaoApp.service('WorkCenter', function() {
   };
 
   this.remove = function(id) {
-    var wcList = JSON.parse(localStorage.getItem('kuihao.wc.' + id));
+    var wcList = JSON.parse(localStorage.getItem('kuihao.wclist'));
     if (wcList == null) return;
     var idx = wcList.indexOf(id);
     if (idx>=0) {
@@ -584,7 +584,10 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
   };
 
   $scope.delete = function() {
-    window.alert("Not implemented yet");
+    if (window.confirm("Delete \"" + centerinfo.name + "\"?")) {
+      WorkCenter.remove(centerinfo.id);
+      $location.path("/workcenter");
+    };
   };
 
   var display_resource = function(resource) {
