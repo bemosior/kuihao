@@ -12,6 +12,58 @@ var generateUUID = function() {
 var kuihaoApp = angular.module('kuihaoApp', [], function() {
 })
 
+kuihaoApp.service('WorkCenter', function() {
+
+  this.generateId = function() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+  };
+
+  this.list = function() {
+    var result = [];
+    var wcList = JSON.parse(localStorage.getItem('kuihao.wclist'));
+    if (wcList == null) return [];
+    wcList.forEach(function(id) {
+      var wc = JSON.parse(localStorage.getItem('kuihao.wc.' + id));
+      result.push({
+        id: wc.id,
+        name: wc.name,
+      });
+    });
+    return result;
+  };
+
+  this.fetch = function(id) {
+    return JSON.parse(localStorage.getItem('kuihao.wc.' + id));
+  };
+
+  this.add = function(wc) {
+    var wcString = JSON.stringify(wc);
+    var wcList = JSON.parse(localStorage.getItem('kuihao.wclist'));
+    if (wcList == null) wcList = [];
+    wcList.push(wc.id);
+    var wcListString = JSON.stringify(wcList);
+    localStorage.setItem('kuihao.wc.' + wc.id, wcString);
+    localStorage.setItem('kuihao.wclist', wcListString);
+  };
+
+  this.update = function(wc) {
+    localStorage.setItem('kuihao.wc.' + wc.id, JSON.stringify(wc));
+    return wc;
+  };
+
+  this.remove = function(id) {
+    var wcList = JSON.parse(localStorage.getItem('kuihao.wc.' + id));
+    if (wcList == null) return;
+    var idx = wcList.indexOf(id);
+    if (idx>=0) {
+      wcList.splice(idx,1);
+      localStorage.removeItem('kuihao.wc.' + id);
+      localStorage.setItem('kuihao.wclist', JSON.stringify(wcList));
+    };
+  };
+
+});
+
 kuihaoApp.controller('PickCtrl', function($scope) {
 })
   .config(['$routeProvider', function($routeProvider) {
@@ -442,7 +494,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location) {
 
 });
 
-kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams) {
+kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams, $route, WorkCenter) {
 
   var WIDTH = 800;
   var HEIGHT = 450;
@@ -451,6 +503,16 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams)
   var workcenter = null;
   var mode = "normal";
   var selectedResource = null;
+
+  $scope.loadSampleData = function() {
+    var centerinfo = sampledata.workcenterinfo();
+    for (var centerId in centerinfo) {
+      if (WorkCenter.fetch(centerId) == null) {
+        WorkCenter.add(centerinfo[centerId]);
+      };
+    };
+    $route.reload();
+  };
 
   $scope.save = function() {
     window.alert("Not implemented yet");
@@ -623,13 +685,11 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams)
     if ($routeParams.workcenterId == null) {
       //list
       var centerList = []
-      for (var centerid in sampledata.workcenterinfo()) {
-        centerList.push({id: centerid, name: sampledata.workcenterinfo()[centerid].name});
-      };
+      centerList = WorkCenter.list();
       $scope.centerList = centerList;
     } else {
       //show
-      centerinfo = sampledata.workcenterinfo()[$routeParams.workcenterId];
+      centerinfo = WorkCenter.fetch($routeParams.workcenterId);
       $scope.name = centerinfo.name;
       $scope.resource = {};
       $scope.$watch('resource.name', function(n,o) { if (n!=o) redraw() });
