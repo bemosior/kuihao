@@ -565,6 +565,16 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
     $route.reload();
   };
 
+  $scope.newWorkCenter = function() {
+    var wc = {
+      id: WorkCenter.generateId(),
+      name: "unnamed",
+      products: [],
+    };
+    WorkCenter.add(wc);
+    $location.path("/workcenter/" + wc.id);
+  };
+
   $scope.save = function() {
     window.alert("Not implemented yet");
   };
