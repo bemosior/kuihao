@@ -172,8 +172,25 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   };
 
   $scope.save = function() {
-    console.log(floorinfo);
-    window.alert("Not implemented yet");
+    var wf = {
+      id: floorinfo.id,
+      name: floorinfo.name,
+      stations: {},
+      connections: floorinfo.connections,
+      flow: floorinfo.flow,
+    };
+    for (var stationId in floorinfo.stations) {
+      wf.stations[stationId] = {
+        id: floorinfo.stations[stationId].id,
+        loc: floorinfo.stations[stationId].loc,
+        type: floorinfo.stations[stationId].type,
+      };
+      if (floorinfo.stations[stationId].type == "product") {
+        wf.stations[stationId].name = floorinfo.stations[stationId].name;
+        wf.stations[stationId].modified = floorinfo.stations[stationId].modified;
+      };
+    }
+    Floor.update(wf);
   };
 
   $scope.download = function() {
