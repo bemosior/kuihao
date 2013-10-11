@@ -159,6 +159,18 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     $route.reload();
   };
 
+  $scope.newWorkFloor = function() {
+    var wf = {
+      id: Floor.generateId(),
+      name: "unnamed",
+      flow: [],
+      stations: {},
+      connections: {},
+    };
+    Floor.add(wf);
+    $location.path("/floor/" + wf.id);
+  };
+
   var drag_move = function (dx, dy) {
     var att;
     var loc = [this.oloc[0] + dx, this.oloc[1] + dy];
