@@ -144,7 +144,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   var connections = null;
 
   var stationShapes = [];
-  var connectionShapes = [];
+  var connectionShapes = {};
 
   var mode = "normal";
   var selectedStation = null;
@@ -341,7 +341,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   var floorDiagram;
   var workCenters, workCenterShapes;
   var products, productShapes;
-  var connections, connectionShapes;
+  var connections, connectionShapes, arrows;
   var floor;
 
   var state = "normal";
@@ -498,6 +498,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
       };
     };
     connectionShapes = [];
+    arrows = {};
     for (var connectionId in connections) {
       var connection = connections[connectionId];
       var source = null;
@@ -519,8 +520,17 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
             })
             .data("connection", connection)
         );
-        lastShape = connectionShapes[connectionShapes.length-1];
-        point = lastShape.getPointAtLength(lastShape.getTotalLength()/2);
+        var lastShape = connectionShapes[connectionShapes.length-1];
+        var point = lastShape.getPointAtLength(lastShape.getTotalLength()/2);
+        var rotation = 0;
+        if (destination[0] == source[0]) {
+          rotation = 0;
+        } else if (destination[0] < source[0]) {
+          rotation = Math.round(Math.atan( (destination[1]-source[1])/(destination[0]-source[0]) )*180/Math.PI)-90;
+        } else {
+          rotation = Math.round(Math.atan( (destination[1]-source[1])/(destination[0]-source[0]) )*180/Math.PI)+90;
+        };
+        arrows[connectionId] = floorDiagram.path("M0,-5L5,5L-5,5Z").transform("t" + [point.x,point.y] + "r" + rotation).attr({stroke: "#000000", fill: "#000000"});
       };
     };
     setupMode();
@@ -584,7 +594,18 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
         var destination = stations[connection.destination].loc
         var pathStr = "M" + source + "L" + destination;
         connectionShape.attr({path: pathStr});
-      }
+        arrow = arrows[connection.source + "|" + connection.destination];
+        var point = connectionShape.getPointAtLength(connectionShape.getTotalLength()/2);
+        var rotation = 0;
+        if (destination[0] == source[0]) {
+          rotation = 0;
+        } else if (destination[0] < source[0]) {
+          rotation = Math.round(Math.atan( (destination[1]-source[1])/(destination[0]-source[0]) )*180/Math.PI)-90;
+        } else {
+          rotation = Math.round(Math.atan( (destination[1]-source[1])/(destination[0]-source[0]) )*180/Math.PI)+90;
+        };
+        arrow.transform("t" + [point.x,point.y] + "r" + rotation);
+      };
     };
   };
 
