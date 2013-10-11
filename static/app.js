@@ -789,11 +789,15 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
           productShapes.push(
             workcenter.text(550, 45+50*i, product.name + "\n" + product.change)
           );
-          workcenter.path("M" + [300,45+50*i] + "L" + [500, 45+50*i])
+          var l = workcenter.path("M" + [300,45+50*i] + "L" + [500, 45+50*i])
             .attr({
               stroke: "#888888",
             })
             .toBack();
+          var m = l.getPointAtLength(l.getTotalLength()/4);
+          var qtrpoint = workcenter.path("M0,-5L5,5L-5,5Z").transform("t" + [m.x,m.y] + "r90").attr({stroke: "#000000", fill: "#000000"});
+          var n = l.getPointAtLength(l.getTotalLength()/4*3);
+          var threeqtrpoint = workcenter.path("M0,-5L5,5L-5,5Z").transform("t" + [n.x,n.y] + "r90").attr({stroke: "#000000", fill: "#000000"});
           break;
         case "input":
           productShapes.push(
@@ -806,11 +810,13 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
           productShapes.push(
             workcenter.text(250, 45+50*i, product.name)
           );
-          workcenter.path("M" + [250,45+50*i] + "L" + [400, 45+50*i])
+          var l = workcenter.path("M" + [250,45+50*i] + "L" + [400, 45+50*i])
             .attr({
               stroke: "#888888",
             })
             .toBack();
+          var m = l.getPointAtLength(l.getTotalLength()/2);
+          var midpoint = workcenter.path("M0,-5L5,5L-5,5Z").transform("t" + [m.x,m.y] + "r90").attr({stroke: "#000000", fill: "#000000"});
           break;
         case "output":
           productShapes.push(
@@ -829,7 +835,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
             })
             .toBack();
           var m = l.getPointAtLength(l.getTotalLength()/2);
-          var midpoint = workcenter.path("M0,-5L5,5L-5,5Z").transform("t" + [m.x,m.y] + "r90").attr({stroke: "#000000"});
+          var midpoint = workcenter.path("M0,-5L5,5L-5,5Z").transform("t" + [m.x,m.y] + "r90").attr({stroke: "#000000", fill: "#000000"});
           break;
       };
       productShapes.forEach(function(productShape) {
