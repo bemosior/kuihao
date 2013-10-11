@@ -380,6 +380,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     // reset mode, clear selection
     selectedStation = null;
     mode = "normal";
+    $scope.displayed = "none";
     // redraw
     redraw();
   };
