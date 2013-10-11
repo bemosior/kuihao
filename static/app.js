@@ -171,6 +171,18 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     $location.path("/floor/" + wf.id);
   };
 
+  $scope.save = function() {
+    window.alert("Not implemented yet");
+  };
+
+  $scope.download = function() {
+    window.alert("Not implemented yet");
+  };
+
+  $scope.delete = function() {
+    window.alert("Not implemented yet");
+  };
+
   var drag_move = function (dx, dy) {
     var att;
     var loc = [this.oloc[0] + dx, this.oloc[1] + dy];
