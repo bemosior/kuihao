@@ -191,6 +191,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
       };
     }
     Floor.update(wf);
+    window.alert("Saved!");
   };
 
   $scope.download = function() {
@@ -345,8 +346,8 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
 
   var state = "normal";
 
-  var workCenterColor  = "#bf6b26";
-  var productColor     = "#26bf4c";
+  var unfulfilledColor = "#CC0033";
+  var fulfilledColor   = "#00CC33";
 
   $scope.addWorkCenter = function() {
     var newWorkcenterId = $scope.addWorkCenterSelection;
@@ -396,6 +397,47 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     redraw();
   };
 
+  var station_fulfilled = function(stationId) {
+    var res = false;
+    var station = stations[stationId];
+    switch (station.type) {
+      case "product":
+        res = false;
+        // If any of this product's sources is a workcenter
+        // which has this product as an output(or modified),
+        // then we're good
+        for (var connectionId in connections) {
+          if (connections[connectionId].destination == stationId) {
+            var wc = WorkCenter.fetch(connections[connectionId].source);
+            wc.products.forEach(function(product) {
+              if ((product.type == "output" || product.type == "modified") && 
+                  (product.name == station.name)) res = true;
+            });
+          };
+        };
+        break;
+      case "workcenter":
+        res = true;
+        // All of the inputs for this workcenter need to be
+        // satisfied
+        var wcRequiredInputs = [];
+        WorkCenter.fetch(station.id).products.forEach(function(product) {
+          if (product.type == "input" || product.type == "modified") wcRequiredInputs.push(product.name);
+        });
+        var wcActualInputs   = [];
+        for (var connectionId in connections) {
+          if (connections[connectionId].destination == stationId) {
+            wcActualInputs.push(stations[connections[connectionId].source].name);
+          };
+        };
+        wcRequiredInputs.forEach(function (req) {
+          if (wcActualInputs.indexOf(req) == -1) res = false;
+        });
+        break;
+    };
+    return res;
+  };
+
   var redraw = function() {
     if ((typeof floorDiagram === 'undefined') || (floorDiagram === null)) {
       floorDiagram = Raphael("floor", WIDTH, HEIGHT);
@@ -410,8 +452,8 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
           var set = floorDiagram.set();
           var circle = floorDiagram.circle(station.loc[0], station.loc[1], PRODUCT.width/2)
             .attr({
-              fill: productColor,
-              stroke: productColor,
+              fill: station_fulfilled(stationId) ? fulfilledColor : unfulfilledColor,
+              stroke: station_fulfilled(stationId) ? fulfilledColor : unfulfilledColor,
               "fill-opacity": 1,
               "stroke-width": 2,
               "cursor" : "move",
@@ -434,8 +476,8 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
           var set = floorDiagram.set();
           var rect = floorDiagram.rect(station.loc[0]-WORKCENTER.width/2, station.loc[1]-WORKCENTER.height/2, WORKCENTER.width, WORKCENTER.height, 5)
             .attr({
-              fill: workCenterColor,
-              stroke: workCenterColor,
+              fill: station_fulfilled(stationId) ? fulfilledColor : unfulfilledColor,
+              stroke: station_fulfilled(stationId) ? fulfilledColor : unfulfilledColor,
               "fill-opacity": 1,
               "stroke-width": 2,
               "cursor" : "move",
@@ -643,6 +685,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
 
   $scope.save = function() {
     WorkCenter.update(centerinfo);
+    window.alert("Saved!");
   };
 
   $scope.download = function() {
