@@ -104,7 +104,7 @@ kuihaoApp.service('Floor', function() {
   };
 
   this.remove = function(id) {
-    var floorList = JSON.parse(localStorage.getItem('kuihao.floor.' + id));
+    var floorList = JSON.parse(localStorage.getItem('kuihao.floorlist'));
     if (floorList == null) return;
     var idx = floorList.indexOf(id);
     if (idx>=0) {
@@ -172,6 +172,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   };
 
   $scope.save = function() {
+    console.log(floorinfo);
     window.alert("Not implemented yet");
   };
 
@@ -180,7 +181,10 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   };
 
   $scope.delete = function() {
-    window.alert("Not implemented yet");
+    if (window.confirm("Delete \"" + floorinfo.name + "\"?")) {
+      Floor.remove(floorinfo.id);
+      $location.path("/floor");
+    };
   };
 
   var drag_move = function (dx, dy) {
