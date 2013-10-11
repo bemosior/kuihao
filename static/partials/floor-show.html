@@ -34,8 +34,8 @@
           </li>
           <li class="">
             <a ng-click="addProduct()">Add Product:</a>
-            <select class="form-control input-sm">
-              <option vale="foo">Foo</option>
+            <select class="form-control input-sm" ng-model="addProductionSelection">
+              <option ng-repeat="product in productList" value="{{product}}">{{product}}</option>
             </select>
           </li>
         </ul>

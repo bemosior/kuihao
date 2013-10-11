@@ -357,6 +357,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     stations[newWorkcenterId] = WorkCenter.fetch(newWorkcenterId);
     stations[newWorkcenterId].loc = [WIDTH/2, HEIGHT/2];
     stations[newWorkcenterId].type = "workcenter";
+    update_productList();
     redraw();
   };
 
@@ -373,6 +374,8 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     cleanup.forEach(function(connectionId) {
       delete connections[connectionId];
     });
+    // update product list to pick from (in case this was a workcenter)
+    update_productList();
     // reset mode, clear selection
     selectedStation = null;
     mode = "normal";
@@ -384,9 +387,10 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     var uuid = generateUUID();
     var product = {
       id: uuid,
-      name: "",
+      name: $scope.addProductionSelection,
       loc: [WIDTH/2, HEIGHT/2],
       type: "product",
+      modified: [],
     };
     stations[uuid] = product;
     redraw();
@@ -541,6 +545,20 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     };
   };
 
+  var update_productList = function() {
+    var productList = [];
+    for (var stationId in stations) {
+      if (stations[stationId].type == "workcenter") {
+        WorkCenter.fetch(stationId).products.forEach(function(product) {
+          if (productList.indexOf(product.name) == -1) {
+            productList.push(product.name);
+          };
+        });
+      };
+    };
+    $scope.productList = productList.sort();
+  };
+
   var calculate_flow = function() {
     floorinfo.flow.forEach(function(workcenterId) {
       var inputs = [];
@@ -585,6 +603,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
       $scope.name = floorinfo.name;
       $scope.$watch('name', function(n,o) { if (n!=o) { floorinfo.name=$scope.name; redraw() }; });
       $scope.centerList = WorkCenter.list();;
+      update_productList();
       calculate_flow();
       redraw();
     };
