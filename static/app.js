@@ -582,6 +582,8 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
       floorinfo = Floor.fetch($routeParams.floorId);
       stations = floorinfo.stations;
       connections = floorinfo.connections;
+      $scope.name = floorinfo.name;
+      $scope.$watch('name', function(n,o) { if (n!=o) { floorinfo.name=$scope.name; redraw() }; });
       $scope.centerList = WorkCenter.list();;
       calculate_flow();
       redraw();
