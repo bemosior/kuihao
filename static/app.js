@@ -524,7 +524,11 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
         var point = lastShape.getPointAtLength(lastShape.getTotalLength()/2);
         var rotation = 0;
         if (destination[0] == source[0]) {
-          rotation = 0;
+          if (destination[1] < source[1]) {
+            rotation = 0;
+          } else {
+            rotation = 180;
+          }
         } else if (destination[0] < source[0]) {
           rotation = Math.round(Math.atan( (destination[1]-source[1])/(destination[0]-source[0]) )*180/Math.PI)-90;
         } else {
@@ -596,9 +600,16 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
         connectionShape.attr({path: pathStr});
         arrow = arrows[connection.source + "|" + connection.destination];
         var point = connectionShape.getPointAtLength(connectionShape.getTotalLength()/2);
+        // 0 = pointing straight up. go clockwise to 359
         var rotation = 0;
         if (destination[0] == source[0]) {
-          rotation = 0;
+          if (destination[1] < source[1]) {
+            // destination is above source in the diagram
+            rotation = 0;
+          } else {
+            // destionation is below source in the diagram
+            rotation = 180;
+          }
         } else if (destination[0] < source[0]) {
           rotation = Math.round(Math.atan( (destination[1]-source[1])/(destination[0]-source[0]) )*180/Math.PI)-90;
         } else {
