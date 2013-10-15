@@ -774,6 +774,9 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
           mode = "normal";
           selectedResource = null;
           $scope.resource = {};
+        } else {
+          selectedResource = this.data("product");
+          $scope.resource = selectedResource;
         };
         break;
     };
