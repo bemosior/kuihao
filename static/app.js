@@ -146,7 +146,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   var stationShapes = [];
   var connectionShapes = {};
 
-  var mode = "normal";
+  var mode = "show";
   var selectedStation = null;
 
   $scope.loadSampleData = function() {
@@ -206,6 +206,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   };
 
   var drag_move = function (dx, dy) {
+    if (mode != "move") return;
     var att;
     var loc = [this.oloc[0] + dx, this.oloc[1] + dy];
     switch (this.data("station").type) {
@@ -240,6 +241,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   };
 
   var drag_start = function() {
+    if (mode != "move") return;
     this.oloc = this.data("station").loc;
     switch (this.type) {
       case "rect":
@@ -264,6 +266,12 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     };
   };
 
+  var display_selectedStation = function() {
+    $scope.$apply(function($scope) {
+      $scope.station = selectedStation;
+    });
+  };
+
   var display_clear = function() {
     $scope.$apply(function($scope) {
       $scope.displayed = "none";
@@ -271,71 +279,75 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     });
   };
 
-  var display_editstation = function() {
-    $scope.$apply(function($scope) {
-      $scope.displayed = "edit" + selectedStation.type;
-      $scope.station   = null; // use editStation instead
-    });
-  };
-
   var hover_in = function() {
     switch (mode) {
-      case "normal":
+      case "show":
+      case "move":
+      case "connect":
+      case "path":
         display_station(this);
-        break;
-      case "edit":
-        if (selectedStation !== this.data("station")) display_station(this);
         break;
     };
   };
 
   var hover_out = function() {
     switch (mode) {
-      case "normal":
+      case "show":
         display_clear();
         break;
-      case "edit":
-        display_editstation();
+      case "move":
+      case "connect":
+      case "path":
+        if (selectedStation != null) {
+          display_selectedStation();
+        } else {
+          display_clear();
+        };
         break;
     };
   };
 
-  var dblclick_enter = function() {
-    mode = "edit";
-    selectedStation = this.data("station");
-    $scope.$apply(function($scope) {
-      $scope.editstation = selectedStation;
-      $scope.displayed = "edit" + selectedStation.type;
-    });
-    redraw();
+  var click = function() {
+    switch (mode) {
+      case "show":
+      case "move":
+        break;
+      case "connect":
+        if (selectedStation != null) {
+          if (this.data("station") == selectedStation) {
+            selectedStation = null;
+            redraw();
+            return;
+          };
+          if (this.data("station").type == selectedStation.type) return;
+          var source = selectedStation;
+          var destination = this.data("station");
+          if (connections[source.id + "|" + destination.id] !== undefined) return;
+          if (connections[destination.id + "|" + source.id] !== undefined) return;
+          connections[source.id + "|" + destination.id] = {
+            source: source.id,
+            destination: destination.id,
+          };
+          calculate_flow();
+          redraw();
+        } else {
+          selectedStation = this.data("station")
+          redraw();
+        };
+        break;
+      case "path":
+        //selectedStation = this.data("station");
+        break;
+    }
   };
 
-  var dblclick_exit = function() {
-    mode = "normal";
-    selectedStation = null;;
-    redraw();
-  };
-
-  var dblclick_remove = function() {
-    var connection = this.data("connection");
-    delete connections[connection.source + "|" + connection.destination];
-    this.remove();
-    redraw();
-  };
-
-  var click_connect = function() {
-    if (this.data("station") === selectedStation) return;
-    if (this.data("station").type == selectedStation.type) return;
-    var source = selectedStation;
-    var destination = this.data("station");
-    if (connections[source.id + "|" + destination.id] !== undefined) return;
-    if (connections[destination.id + "|" + source.id] !== undefined) return;
-    connections[source.id + "|" + destination.id] = {
-      source: source.id,
-      destination: destination.id,
+  var clickConnection = function() {
+    if (mode == "connect") {
+      var connection = this.data("connection");
+      delete connections[connection.source + "|" + connection.destination];
+      this.remove();
+      redraw();
     };
-    calculate_flow();
-    redraw();
   };
 
   var floorDiagram;
@@ -439,6 +451,71 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     return res;
   };
 
+  var leaveMode = {
+    "show": function() {
+    },
+    "move": function() {
+      stationShapes.forEach(function(set) {
+        set.attr({"cursor": "default"});
+      });
+    },
+    "connect": function() {
+      stationShapes.forEach(function(set) {
+        set.attr({"cursor": "default"});
+      });
+      selectedStation = null;
+    },
+    "path": function() {
+    },
+  };
+
+  $scope.showMode = function() {
+    leaveMode[mode]();
+    mode = "show";
+    redraw();
+  };
+
+  $scope.moveMode = function() {
+    leaveMode[mode]();
+    if (mode != "move") {
+      mode = "move";
+      stationShapes.forEach(function(set) {
+        set.attr({"cursor": "move"});
+      });
+    } else {
+      mode = "show";
+    }
+  };
+
+  $scope.connectMode = function() {
+    leaveMode[mode]();
+    if (mode != "connect") {
+      mode = "connect";
+      stationShapes.forEach(function(set) {
+        set.attr({"cursor": "crosshair"});
+      });
+    } else {
+      mode = "show";
+    }
+  };
+
+  $scope.pathMode = function() {
+    leaveMode[mode]();
+    if (mode != "path") {
+      mode = "path";
+    } else {
+      mode = "show";
+    }
+  };
+
+  $scope.classMode = function(checkName) {
+    if (mode == checkName) {
+      return "btn-success";
+    } else {
+      return "btn-primary";
+    };
+  }
+
   var redraw = function() {
     if ((typeof floorDiagram === 'undefined') || (floorDiagram === null)) {
       floorDiagram = Raphael("floor", WIDTH, HEIGHT);
@@ -457,7 +534,6 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
               stroke: station_fulfilled(stationId) ? fulfilledColor : unfulfilledColor,
               "fill-opacity": 1,
               "stroke-width": 2,
-              "cursor" : "move",
             })
             .data("set", set)
             .data("station", station);
@@ -470,6 +546,10 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
             .data("station", station);
           set
             .push(circle, label);
+          set
+            .hover(hover_in, hover_out)
+            .drag(drag_move, drag_start)
+            .click(click);
           stationShapes.push(set);
           station.shape = set;
           break;
@@ -481,7 +561,6 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
               stroke: station_fulfilled(stationId) ? fulfilledColor : unfulfilledColor,
               "fill-opacity": 1,
               "stroke-width": 2,
-              "cursor" : "move",
             })
             .data("set", set)
             .data("station", station);
@@ -490,12 +569,26 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
             .data("station", station);
           set
             .push(rect, label);
+          set
+            .hover(hover_in, hover_out)
+            .drag(drag_move, drag_start)
+            .click(click);
           stationShapes.push(set);
           station.shape = set;
           break;
         default:
           break;
       };
+    };
+    if (selectedStation != null) {
+      selectedStation.shape.forEach(function (el) {
+        if (el.type !== "text") {
+          el.attr({
+            "stroke": "#daa520",
+              "stroke-width": 5,
+          });
+        };
+      });
     };
     connectionShapes = [];
     arrows = {};
@@ -517,7 +610,9 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
             .attr({
               "stroke-width": 3,
               "stroke": "#c0c0c0",
+              "cursor": "not-allowed",
             })
+            .click(clickConnection)
             .data("connection", connection)
         );
         var lastShape = connectionShapes[connectionShapes.length-1];
@@ -534,59 +629,18 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
         } else {
           rotation = Math.round(Math.atan( (destination[1]-source[1])/(destination[0]-source[0]) )*180/Math.PI)+90;
         };
-        arrows[connectionId] = floorDiagram.path("M0,-5L5,5L-5,5Z").transform("t" + [point.x,point.y] + "r" + rotation).attr({stroke: "#000000", fill: "#000000"});
+        arrows[connectionId] = floorDiagram.path("M0,-5L5,5L-5,5Z")
+          .transform("t" + [point.x,point.y] + "r" + rotation)
+          .attr({
+            stroke: "#000000",
+            fill: "#000000",
+            cursor: "not-allowed"
+          })
+          .click(clickConnection)
+          .data("connection", connection);
       };
     };
-    setupMode();
-  };
-
-  var setupMode = function() {
-    stationShapes.forEach(function (stationShape) {
-      stationShape.attr({"cursor":"default"});
-      stationShape.undrag(drag_move, drag_start);
-      stationShape.unhover(hover_in, hover_out);
-      //stationShape.undblclick(dblclick_enter);
-      //stationShape.undblclick(dblclick_exit);
-      //stationShape.unclick(click_connect);
-    });
-    connectionShapes.forEach(function (connectionShape) {
-    });
-    switch (mode) {
-      case "normal":
-        stationShapes.forEach(function (stationShape) {
-          stationShape.drag(drag_move, drag_start);
-          stationShape.attr({"cursor":"move"});
-          stationShape.hover(hover_in, hover_out);
-          stationShape.dblclick(dblclick_enter);
-        });
-        connectionShapes.forEach(function (connectionShape) {
-          connectionShape.dblclick(dblclick_remove);
-          connectionShape.attr({"cursor":"not-allowed"});
-        });
-        break;
-      case "edit":
-        if (selectedStation !== null) {
-          selectedStation.shape.forEach(function (el) {
-            if (el.type !== "text") {
-              el.attr({
-                "stroke": "#daa520",
-                "stroke-width": 5,
-              });
-            };
-          });
-        };
-        stationShapes.forEach(function (stationShape) {
-          stationShape.attr({"cursor":"pointer"});
-          if (stationShape.data("station") !== selectedStation) {
-            stationShape.hover(hover_in, hover_out);
-          };
-          stationShape.dblclick(dblclick_exit);
-          stationShape.click(click_connect);
-        });
-        connectionShapes.forEach(function (connectionShape) {
-        });
-        break;
-    };
+    //setupMode();
   };
 
   var update_connections = function(station) {
