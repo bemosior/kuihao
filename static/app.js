@@ -285,6 +285,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
       case "move":
       case "connect":
       case "path":
+      case "delete":
         display_station(this);
         break;
     };
@@ -293,9 +294,10 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   var hover_out = function() {
     switch (mode) {
       case "show":
+      case "move":
+      case "delete":
         display_clear();
         break;
-      case "move":
       case "connect":
       case "path":
         if (selectedStation != null) {
@@ -338,6 +340,29 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
       case "path":
         //selectedStation = this.data("station");
         break;
+      case "delete":
+        var station = this.data("station");
+        if (window.confirm("Delete \"" + station.name + "\"?")) {
+          // remove the selected station
+          delete stations[station.id];
+          // clean up any lingering connections
+          var cleanup = []
+          for (connectionId in connections) {
+            if (connections[connectionId].source == station.id || connections[connectionId].destination == station.id) {
+              cleanup.push(connectionId);
+            };
+          };
+          cleanup.forEach(function(connectionId) {
+            delete connections[connectionId];
+          });
+          // update product list to pick from (in case this was a workcenter)
+          update_productList();
+          // reset mode, clear selection
+          $scope.displayed = "none";
+          // redraw
+          redraw();
+        };
+        break;
     }
   };
 
@@ -371,29 +396,6 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     stations[newWorkcenterId].loc = [WIDTH/2, HEIGHT/2];
     stations[newWorkcenterId].type = "workcenter";
     update_productList();
-    redraw();
-  };
-
-  $scope.deleteSelectedStation = function() {
-    // remove the selected station
-    delete stations[selectedStation.id];
-    // clean up any lingering connections
-    var cleanup = []
-    for (connectionId in connections) {
-      if (connections[connectionId].source == selectedStation.id || connections[connectionId].destination == selectedStation.id) {
-        cleanup.push(connectionId);
-      };
-    };
-    cleanup.forEach(function(connectionId) {
-      delete connections[connectionId];
-    });
-    // update product list to pick from (in case this was a workcenter)
-    update_productList();
-    // reset mode, clear selection
-    selectedStation = null;
-    mode = "normal";
-    $scope.displayed = "none";
-    // redraw
     redraw();
   };
 
@@ -467,6 +469,8 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     },
     "path": function() {
     },
+    "delete": function() {
+    },
   };
 
   $scope.showMode = function() {
@@ -508,13 +512,25 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     }
   };
 
+  $scope.deleteMode = function() {
+    leaveMode[mode]();
+    if (mode != "delete") {
+      mode = "delete";
+      stationShapes.forEach(function(set) {
+        set.attr({"cursor": "not-allowed"});
+      });
+    } else {
+      mode = "show";
+    };
+  };
+
   $scope.classMode = function(checkName) {
     if (mode == checkName) {
       return "btn-success";
     } else {
       return "btn-primary";
     };
-  }
+  };
 
   var redraw = function() {
     if ((typeof floorDiagram === 'undefined') || (floorDiagram === null)) {
