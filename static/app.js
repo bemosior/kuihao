@@ -124,6 +124,7 @@ kuihaoApp.controller('PickCtrl', function($scope) {
       .when('/floor/:floorId', {templateUrl: 'partials/floor-show.html', controller: 'MainCtrl'})
       .when('/workcenter', {templateUrl: 'partials/workcenter-list.html', controller: 'WorkCenterCtrl'})
       .when('/workcenter/:workcenterId', {templateUrl: 'partials/workcenter-show.html', controller: 'WorkCenterCtrl'})
+      .otherwise({redirectTo: '/floor'})
     ;
   }]);
 
