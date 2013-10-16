@@ -528,61 +528,57 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   };
 
   $scope.moveMode = function() {
-    leaveMode[mode]();
-    if (mode != "move") {
-      mode = "move";
-    } else {
-      mode = "show";
+    if (mode == "move") {
+      $scope.showMode();
+      return;
     };
+    leaveMode[mode]();
+    mode = "move";
     updateCursor();
   };
 
   $scope.connectMode = function() {
-    leaveMode[mode]();
-    if (mode != "connect") {
-      mode = "connect";
-    } else {
-      mode = "show";
+    if (mode == "connect") {
+      $scope.showMode();
+      return;
     };
+    leaveMode[mode]();
+    mode = "connect";
     updateCursor();
   };
 
   $scope.pathMode = function() {
-    leaveMode[mode]();
-    if (mode != "path") {
-      pathShapes = [];
-      mode = "path";
-      var idx = 1;
-      floorinfo.flow.forEach(function(stationId) {
-        var station = stations[stationId];
-        var pathShape = floorDiagram.text(station.loc[0], station.loc[1]-20, idx)
-          .attr({
-            "stroke": "#0000ff",
-            "font-size": "20",
-            "cursor": cursor(),
-          })
-          .data("station", station)
-          .click(click);
-        pathShapes.push(pathShape);
-        idx += 1;
-      });
-    } else {
-      pathShapes.forEach(function(pathShape) {
-        pathShape.remove();
-      });
-      pathShapes = null;
-      mode = "show";
+    if (mode == "path") {
+      $scope.showMode();
+      return;
     };
+    leaveMode[mode]();
+    mode = "path";
+    pathShapes = [];
+    var idx = 1;
+    floorinfo.flow.forEach(function(stationId) {
+      var station = stations[stationId];
+      var pathShape = floorDiagram.text(station.loc[0], station.loc[1]-20, idx)
+        .attr({
+          "stroke": "#0000ff",
+          "font-size": "20",
+          "cursor": cursor(),
+        })
+        .data("station", station)
+        .click(click);
+      pathShapes.push(pathShape);
+      idx += 1;
+    });
     updateCursor();
   };
 
   $scope.deleteMode = function() {
-    leaveMode[mode]();
-    if (mode != "delete") {
-      mode = "delete";
-    } else {
-      mode = "show";
+    if (mode == "delete") {
+      $scope.showMode();
+      return;
     };
+    leaveMode[mode]();
+    mode = "delete";
     updateCursor();
   };
 
