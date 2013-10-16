@@ -339,7 +339,32 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
         };
         break;
       case "path":
-        //selectedStation = this.data("station");
+        // three cases:
+        if (this.data("station").type == "workcenter") {
+          if (floorinfo.flow.indexOf(this.data("station").id) == -1) {
+            // 1.) this isn't in the path at all, so add it
+            floorinfo.flow.push(this.data("station").id);
+            var station = this.data("station");
+            var pathShape = floorDiagram.text(station.loc[0], station.loc[1]-20, floorinfo.flow.length)
+              .attr({
+                "stroke": "#0000ff",
+                "font-size": "20",
+                "cursor": cursor(),
+              })
+              .data("station", station)
+              .click(click);
+            pathShapes.push(pathShape);
+          } else if (floorinfo.flow.indexOf(this.data("station").id) == floorinfo.flow.length-1) {
+            // 2.) this is the last one in the path, so remove it
+            if (floorinfo.flow.length > 0) {
+              pathShapes.pop().remove();
+              floorinfo.flow.pop();
+            };
+          } else {
+            // 3.) this isn't the last one in the path, so leave it and alert
+            window.alert("Must choose last of the path");
+          };
+        };
         break;
       case "delete":
         var station = this.data("station");
@@ -380,6 +405,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   var workCenters, workCenterShapes;
   var products, productShapes;
   var connections, connectionShapes, arrows;
+  var pathShapes;
   var floor;
 
   var state = "normal";
@@ -463,7 +489,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
       case "connect":
         return "crosshair";
       case "path":
-        return "default";
+        return "crosshair";
       case "delete":
         return "not-allowed";
       default:
@@ -486,6 +512,10 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
       selectedStation = null;
     },
     "path": function() {
+      pathShapes.forEach(function(pathShape) {
+        pathShape.remove();
+      });
+      pathShapes = null;
     },
     "delete": function() {
     },
@@ -520,8 +550,27 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   $scope.pathMode = function() {
     leaveMode[mode]();
     if (mode != "path") {
+      pathShapes = [];
       mode = "path";
+      var idx = 1;
+      floorinfo.flow.forEach(function(stationId) {
+        var station = stations[stationId];
+        var pathShape = floorDiagram.text(station.loc[0], station.loc[1]-20, idx)
+          .attr({
+            "stroke": "#0000ff",
+            "font-size": "20",
+            "cursor": cursor(),
+          })
+          .data("station", station)
+          .click(click);
+        pathShapes.push(pathShape);
+        idx += 1;
+      });
     } else {
+      pathShapes.forEach(function(pathShape) {
+        pathShape.remove();
+      });
+      pathShapes = null;
       mode = "show";
     };
     updateCursor();
