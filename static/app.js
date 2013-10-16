@@ -454,18 +454,35 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     return res;
   };
 
+  var cursor = function() {
+    switch (mode) {
+      case "show":
+        return "default";
+      case "move":
+        return "move";
+      case "connect":
+        return "crosshair";
+      case "path":
+        return "default";
+      case "delete":
+        return "not-allowed";
+      default:
+        return "default";
+    };
+  };
+
+  var updateCursor = function() {
+    stationShapes.forEach(function(set) {
+      set.attr({"cursor": cursor()});
+    });
+  }
+
   var leaveMode = {
     "show": function() {
     },
     "move": function() {
-      stationShapes.forEach(function(set) {
-        set.attr({"cursor": "default"});
-      });
     },
     "connect": function() {
-      stationShapes.forEach(function(set) {
-        set.attr({"cursor": "default"});
-      });
       selectedStation = null;
     },
     "path": function() {
@@ -477,31 +494,27 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   $scope.showMode = function() {
     leaveMode[mode]();
     mode = "show";
-    redraw();
+    updateCursor();
   };
 
   $scope.moveMode = function() {
     leaveMode[mode]();
     if (mode != "move") {
       mode = "move";
-      stationShapes.forEach(function(set) {
-        set.attr({"cursor": "move"});
-      });
     } else {
       mode = "show";
-    }
+    };
+    updateCursor();
   };
 
   $scope.connectMode = function() {
     leaveMode[mode]();
     if (mode != "connect") {
       mode = "connect";
-      stationShapes.forEach(function(set) {
-        set.attr({"cursor": "crosshair"});
-      });
     } else {
       mode = "show";
-    }
+    };
+    updateCursor();
   };
 
   $scope.pathMode = function() {
@@ -510,19 +523,18 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
       mode = "path";
     } else {
       mode = "show";
-    }
+    };
+    updateCursor();
   };
 
   $scope.deleteMode = function() {
     leaveMode[mode]();
     if (mode != "delete") {
       mode = "delete";
-      stationShapes.forEach(function(set) {
-        set.attr({"cursor": "not-allowed"});
-      });
     } else {
       mode = "show";
     };
+    updateCursor();
   };
 
   $scope.classMode = function(checkName) {
@@ -551,19 +563,17 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
               stroke: station_fulfilled(stationId) ? fulfilledColor : unfulfilledColor,
               "fill-opacity": 1,
               "stroke-width": 2,
-            })
-            .data("set", set)
-            .data("station", station);
+            });
           var productlabel = station.name;
           if (station.modified != 0) {
             productlabel += "\n" + station.modified.join(",");
           };
-          var label = floorDiagram.text(station.loc[0], station.loc[1], productlabel)
+          var label = floorDiagram.text(station.loc[0], station.loc[1], productlabel);
+          set
+            .push(circle, label)
+            .attr({cursor: cursor()})
             .data("set", set)
-            .data("station", station);
-          set
-            .push(circle, label);
-          set
+            .data("station", station)
             .hover(hover_in, hover_out)
             .drag(drag_move, drag_start)
             .click(click);
@@ -578,15 +588,13 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
               stroke: station_fulfilled(stationId) ? fulfilledColor : unfulfilledColor,
               "fill-opacity": 1,
               "stroke-width": 2,
-            })
-            .data("set", set)
-            .data("station", station);
-          var label = floorDiagram.text(station.loc[0], station.loc[1], WorkCenter.fetch(station.id).name)
-            .data("set", set)
-            .data("station", station);
+            });
+          var label = floorDiagram.text(station.loc[0], station.loc[1], WorkCenter.fetch(station.id).name);
           set
-            .push(rect, label);
-          set
+            .push(rect, label)
+            .attr({cursor: cursor()})
+            .data("set", set)
+            .data("station", station)
             .hover(hover_in, hover_out)
             .drag(drag_move, drag_start)
             .click(click);
