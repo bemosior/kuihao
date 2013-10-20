@@ -88,6 +88,7 @@ var sampledata = {
             type: 'input',
           },
         ],
+        steps: [],
       },
       "d8e5fa43-63d3-4228-9c93-ff1c64d2371b": {
         id: "d8e5fa43-63d3-4228-9c93-ff1c64d2371b",
@@ -103,6 +104,7 @@ var sampledata = {
             type: 'input',
           },
         ],
+        steps: [],
       },
     };
   },
