@@ -54,7 +54,7 @@
           <li ng-repeat="step in steps">
             <div>
               <button class="btn btn-small" ng-click="moveUp($index)" ng-disabled="$index==0"><i class="icon-arrow-up"></i></button>
-              <button class="btn btn-small" ng-click="moveDown($index)" ng-disabled="$index+1 == checklist.steps.length"><i class="icon-arrow-down"></i></button>
+              <button class="btn btn-small" ng-click="moveDown($index)" ng-disabled="$index+1 == steps.length"><i class="icon-arrow-down"></i></button>
               <button class="btn btn-small" ng-click="deleteStep($index)"><i class="icon-trash"></i></button>
               <input style="width: 600px;" ng-model="step.text">
               <textarea type="text" style="width: 712px" ng-model="step.full"></textarea>

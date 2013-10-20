@@ -1084,7 +1084,19 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
     $scope.steps = tmpSteps;
   };
 
+  $scope.moveUp = function(idx) {
+    var tmpSteps = $scope.steps.slice(0);
+    var movingStep = tmpSteps.splice(idx,1)[0];
+    tmpSteps.splice(idx-1,0,movingStep);
+    $scope.steps = tmpSteps;
+  };
 
+  $scope.moveDown = function(idx) {
+    var tmpSteps = $scope.steps.slice(0);
+    var movingStep = tmpSteps.splice(idx,1)[0];
+    tmpSteps.splice(idx+1,0,movingStep);
+    $scope.steps = tmpSteps;
+  };
 
 });
 
