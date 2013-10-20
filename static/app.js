@@ -1076,7 +1076,14 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
     $scope.newStep = {text: "", full: ""};
     // It'd be nice to change the focus to go back to the newStep's Short
     // Description.
-  }
+  };
+
+  $scope.deleteStep = function(idx) {
+    var tmpSteps = $scope.steps.slice(0);
+    tmpSteps.splice(idx,1);
+    $scope.steps = tmpSteps;
+  };
+
 
 
 });
