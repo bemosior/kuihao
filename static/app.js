@@ -1036,6 +1036,8 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
       $scope.$watch('resource.name', function(n,o) { if (n!=o) redraw() });
       $scope.$watch('resource.type', function(n,o) { if (n!=o) redraw() });
       $scope.$watch('resource.change', function(n,o) { if (n!=o) redraw() });
+      $scope.steps = [];
+      $scope.newStep = {text: "", full: ""};
       redraw();
     };
   };
@@ -1061,6 +1063,21 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
     };
     redraw();
   };
+
+  $scope.addStep = function() {
+    if (!$scope.newStep.text.length && !$scope.newStep.full.length) {
+      window.alert("New steps must not be blank.");
+      return;
+    };
+    $scope.steps.push({
+      text: $scope.newStep.text,
+      full: $scope.newStep.full
+    });
+    $scope.newStep = {text: "", full: ""};
+    // It'd be nice to change the focus to go back to the newStep's Short
+    // Description.
+  }
+
 
 });
 

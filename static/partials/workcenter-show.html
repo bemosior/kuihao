@@ -49,11 +49,26 @@
     </div>
     <div class="span9">
       <div id="workcenter"></div>
-    </div>
-  </div>
-  <div class="row-fluid">
-    <div class="span12 well">
-STEPS!
+      <div id="steps" class="well">
+        <ul>
+          <li ng-repeat="step in steps">
+            <div>
+              <button class="btn btn-small" ng-click="moveUp($index)" ng-disabled="$index==0"><i class="icon-arrow-up"></i></button>
+              <button class="btn btn-small" ng-click="moveDown($index)" ng-disabled="$index+1 == checklist.steps.length"><i class="icon-arrow-down"></i></button>
+              <button class="btn btn-small" ng-click="deleteStep($index)"><i class="icon-trash"></i></button>
+              <input style="width: 600px;" ng-model="step.text">
+              <textarea type="text" style="width: 712px" ng-model="step.full"></textarea>
+            </div>
+          </li>
+          <li>
+            <div>
+              <button class="btn btn-primary btn-small" ng-click="addStep()">Add New Step</button>
+              <input placeholder="Short Description" style="width: 617px;" ng-model="newStep.text"/>
+              <textarea placeholder="Full Description" style="width: 712px;" ng-model="newStep.full"></textarea>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 
