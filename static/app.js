@@ -813,7 +813,6 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
 kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams, $route, WorkCenter) {
 
   var WIDTH = 800;
-  var HEIGHT = 450;
 
   var centerinfo = null;
   var workcenter = null;
@@ -909,17 +908,19 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
   };
 
   var redraw = function() {
+    var height = 30+50*centerinfo.products.length;
     if (workcenter != null) {
       workcenter.clear();
+      workcenter.setSize(WIDTH, height);
     } else {
-      workcenter = Raphael("workcenter", WIDTH, HEIGHT);
+      workcenter = Raphael("workcenter", WIDTH, height);
     }
-    workcenter.rect(WIDTH/2-20, 0, 40, HEIGHT, 0)
+    workcenter.rect(WIDTH/2-20, 0, 40, height, 0)
       .attr({
         fill: "#ccccff",
         stroke: "#ccccff",
       });
-    workcenter.text(400, 150, centerinfo.name)
+    workcenter.text(400, height/2, centerinfo.name)
       .attr({
         stroke: "#000000",
       })
