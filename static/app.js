@@ -33,7 +33,14 @@ kuihaoApp.service('WorkCenter', function() {
   };
 
   this.fetch = function(id) {
-    return JSON.parse(localStorage.getItem('kuihao.wc.' + id));
+    var res = JSON.parse(localStorage.getItem('kuihao.wc.' + id));
+    if (res.products == null) {
+      res.products = [];
+    };
+    if (res.steps == null) {
+      res.steps = [];
+    };
+    return res;
   };
 
   this.add = function(wc) {
@@ -840,6 +847,12 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
   };
 
   $scope.save = function() {
+    // make sure steps are fixed up since they aren't $watched
+    var steps = [];
+    $scope.steps.forEach(function(step) {
+      steps.push({text: step.text, full: step.full});
+    });
+    centerinfo.steps = steps;
     WorkCenter.update(centerinfo);
     window.alert("Saved!");
   };
@@ -1021,6 +1034,14 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
     return (mode == "selected");
   };
 
+  var setSteps = function() {
+    var steps = [];
+    centerinfo.steps.forEach(function(step) {
+      steps.push({text: step.text, full: step.full});
+    });
+    $scope.steps = steps;
+  };
+
   $scope.resetInit = function() {
     if ($routeParams.workcenterId == null) {
       //list
@@ -1036,7 +1057,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
       $scope.$watch('resource.name', function(n,o) { if (n!=o) redraw() });
       $scope.$watch('resource.type', function(n,o) { if (n!=o) redraw() });
       $scope.$watch('resource.change', function(n,o) { if (n!=o) redraw() });
-      $scope.steps = [];
+      setSteps();
       $scope.newStep = {text: "", full: ""};
       redraw();
     };
@@ -1079,23 +1100,20 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
   };
 
   $scope.deleteStep = function(idx) {
-    var tmpSteps = $scope.steps.slice(0);
-    tmpSteps.splice(idx,1);
-    $scope.steps = tmpSteps;
+    centerinfo.steps.splice(idx,1);
+    setSteps();
   };
 
   $scope.moveUp = function(idx) {
-    var tmpSteps = $scope.steps.slice(0);
-    var movingStep = tmpSteps.splice(idx,1)[0];
-    tmpSteps.splice(idx-1,0,movingStep);
-    $scope.steps = tmpSteps;
+    var movingStep = centerinfo.steps.splice(idx,1)[0];
+    centerinfo.steps.splice(idx-1,0,movingStep);
+    setSteps();
   };
 
   $scope.moveDown = function(idx) {
-    var tmpSteps = $scope.steps.slice(0);
-    var movingStep = tmpSteps.splice(idx,1)[0];
-    tmpSteps.splice(idx+1,0,movingStep);
-    $scope.steps = tmpSteps;
+    var movingStep = centerinfo.steps.splice(idx,1)[0];
+    centerinfo.steps.splice(idx+1,0,movingStep);
+    setSteps();
   };
 
 });
