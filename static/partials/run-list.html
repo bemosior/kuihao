@@ -1,10 +1,10 @@
 
-<div ng-controller="MainCtrl" ng-init="resetInit()" style="padding-top: 80px">
+<div ng-controller="RunCtrl" ng-init="resetInit()" style="padding-top: 80px">
 
   <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
-        <a class="brand">Floor List</a>
+        <a class="brand">Run List</a>
       </div>
     </div>
   </div>
@@ -17,7 +17,6 @@
           <li><a href="#/floor">Work Floors</a></li>
           <li><a href="#/run">Runs</a></li>
           <li class="nav-header">File</li>
-          <li><a ng-click="newWorkFloor()">New Work Floor</a></li>
           <li><a ng-click="loadSampleData()">Load Sample Data</a></li>
         </ul>
       </div>
@@ -26,10 +25,10 @@
       <table class="table table-striped">
         <thead><tr><th>#</th><th>Name</th><th>ID</th></tr></thead>
         <tbody>
-          <tr ng-repeat="floor in floorList">
+          <tr ng-repeat="run in runList">
             <td>{{$index+1}}</td>
-            <td><a href="#/floor/{{floor.id}}">{{floor.name}}</a></td>
-            <td><a href="#/floor/{{floor.id}}">{{floor.id}}</a></td>
+            <td><a href="#/run/{{run.id}}">{{run.floorname}}({{run.starttime}})</a></td>
+            <td><a href="#/run/{{run.id}}">{{run.id}}</a></td>
           </tr>
         </tbody>
       <table>

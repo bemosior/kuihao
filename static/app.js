@@ -123,6 +123,72 @@ kuihaoApp.service('Floor', function() {
 
 });
 
+kuihaoApp.service('Run', function(Floor, WorkCenter) {
+
+  this.generateId = function() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+  };
+
+  this.list = function() {
+    var result = [];
+    var runList = JSON.parse(localStorage.getItem('kuihao.runlist'));
+    if (runList == null) return [];
+    runList.forEach(function(id) {
+      var run = JSON.parse(localStorage.getItem('kuihao.run.' + id));
+      result.push({
+        id: run.id,
+        floorname: run.floorname,
+        starttime: (new Date(run.starttime)).toString(),
+      });
+    });
+    return result;
+  };
+
+  this.create = function(floorId) {
+    var run = {
+      id: this.generateId(),
+      floorId: floorId,
+      flow: [],
+      starttime: (new Date()).getTime(),
+    };
+    var wf = Floor.fetch(floorId);
+    run.floorname = wf.name;
+    wf.flow.forEach(function(stationId) {
+      var wc = WorkCenter.fetch(stationId);
+      run.flow.push({
+        text: wc.name,
+      });
+    });
+    var runList = JSON.parse(localStorage.getItem('kuihao.runlist'));
+    if (runList == null) runList = [];
+    runList.push(run.id);
+    localStorage.setItem('kuihao.run.' + run.id, JSON.stringify(run));
+    localStorage.setItem('kuihao.runlist', JSON.stringify(runList));
+    return run.id;
+  };
+
+  this.fetch = function(id) {
+    return JSON.parse(localStorage.getItem('kuihao.run.' + id));
+  };
+
+  this.update = function(run) {
+    localStorage.setItem('kuihao.run.' + run.id, JSON.stringify(run));
+    return run;
+  };
+
+  this.remove = function(id) {
+    var runList = JSON.parse(localStorage.getItem('kuihao.runlist'));
+    if (runList == null) return;
+    var idx = runList.indexOf(id);
+    if (idx>=0) {
+      runList.splice(idx,1);
+      localStorage.removeItem('kuihao.run.' + id);
+      localStorage.setItem('kuihao.runlist', JSON.stringify(runList));
+    };
+  };
+
+});
+
 kuihaoApp.controller('PickCtrl', function($scope) {
 })
   .config(['$routeProvider', function($routeProvider) {
@@ -131,11 +197,13 @@ kuihaoApp.controller('PickCtrl', function($scope) {
       .when('/floor/:floorId', {templateUrl: 'partials/floor-show.html', controller: 'MainCtrl'})
       .when('/workcenter', {templateUrl: 'partials/workcenter-list.html', controller: 'WorkCenterCtrl'})
       .when('/workcenter/:workcenterId', {templateUrl: 'partials/workcenter-show.html', controller: 'WorkCenterCtrl'})
+      .when('/run', {templateUrl: 'partials/run-list.html', controller: 'RunCtrl'})
+      .when('/run/:runId', {templateUrl: 'partials/run-show.html', controller: 'RunCtrl'})
       .otherwise({redirectTo: '/floor'})
     ;
   }]);
 
-kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $route, WorkCenter, Floor) {
+kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $route, WorkCenter, Floor, Run) {
 
   var WIDTH = 800;
   var HEIGHT = 450;
@@ -815,6 +883,11 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
     };
   };
 
+  $scope.runMe = function() {
+    var run = Run.create(floorinfo.id);
+    $location.path('/run/' + run.id);
+  };
+
 });
 
 kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams, $route, WorkCenter) {
@@ -1118,3 +1191,26 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
 
 });
 
+kuihaoApp.controller('RunCtrl', function($scope, $routeParams, Run) {
+
+  $scope.save = function() {
+    window.alert("Not implemented yet");
+  };
+
+  $scope.download = function() {
+    window.alert("Not implemented yet");
+  };
+
+  $scope.delete = function() {
+    window.alert("Not implemented yet");
+  };
+
+  $scope.resetInit = function() {
+    if ($routeParams.runId == null) {
+      var runList = Run.list();
+      $scope.runList = runList;
+    } else {
+    };
+  };
+
+});

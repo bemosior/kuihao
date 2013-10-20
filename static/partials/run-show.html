@@ -4,11 +4,13 @@
   <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
-        <a class="brand">Floor List</a>
+        <a class="brand">Floor Run : <input class="input-sm" type="text" id="Name1" ng-model="floorname" ng-disabled="true"/></a>
       </div>
     </div>
   </div>
+
   <div class="row-fluid">
+
     <div class="span3">
       <div class="well sidebar-nav">
         <ul class="nav nav-list">
@@ -16,24 +18,23 @@
           <li><a href="#/workcenter">Work Centers</a></li>
           <li><a href="#/floor">Work Floors</a></li>
           <li><a href="#/run">Runs</a></li>
-          <li class="nav-header">File</li>
-          <li><a ng-click="newWorkFloor()">New Work Floor</a></li>
-          <li><a ng-click="loadSampleData()">Load Sample Data</a></li>
+          <li class="nav-header">File - Floor</li>
+          <li><a href="#/run">Close</a></li>
+          <li><a ng-click="save()">Save</a></li>
+          <li><a ng-click="download()">Download</a></li>
+          <li><a ng-click="delete()">Delete</a></li>
         </ul>
       </div>
+      <div class="well">
+        Step Info?
+      </div>
     </div>
+
     <div class="span9">
-      <table class="table table-striped">
-        <thead><tr><th>#</th><th>Name</th><th>ID</th></tr></thead>
-        <tbody>
-          <tr ng-repeat="floor in floorList">
-            <td>{{$index+1}}</td>
-            <td><a href="#/floor/{{floor.id}}">{{floor.name}}</a></td>
-            <td><a href="#/floor/{{floor.id}}">{{floor.id}}</a></td>
-          </tr>
-        </tbody>
-      <table>
+Run Info?
     </div>
+
   </div>
+
 
 </div>
