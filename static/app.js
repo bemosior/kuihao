@@ -1191,7 +1191,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
 
 });
 
-kuihaoApp.controller('RunCtrl', function($scope, $routeParams, Run) {
+kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
 
   var runinfo = null;
 
@@ -1220,7 +1220,10 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, Run) {
   };
 
   $scope.delete = function() {
-    window.alert("Not implemented yet");
+    if (window.confirm("Delete \"" + runinfo.name + "\"?")) {
+      Run.remove(runinfo.id);
+      $location.path("/run");
+    };
   };
 
   $scope.downloadSummary = function() {
