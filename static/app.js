@@ -1200,17 +1200,16 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
     var run = {
       id: runinfo.id,
       floorId: runinfo.floorId,
+      floorname: runinfo.floorname,
       flow: [],
       starttime: runinfo.starttime,
     };
     runinfo.flow.forEach(function(step) {
-      console.log(step);
       run.flow.push({
         text: step.text,
         doneP: step.doneP ? true : false,
       });
     });
-    console.log(run.flow);
     Run.update(run);
     window.alert("Saved!");
   };
