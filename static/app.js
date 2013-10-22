@@ -158,13 +158,15 @@ kuihaoApp.service('Run', function(Floor, WorkCenter) {
       var wc = WorkCenter.fetch(stationId);
       if (wc.steps.length == 0) {
         run.flow.push({
-          wc: wcCount,
+          wcCount: wcCount,
+          wc: wc.name,
           text: wc.name,
         });
       } else {
         wc.steps.forEach(function(step) {
           run.flow.push({
-            wc: wcCount,
+            wcCount: wcCount,
+            wc: wc.name,
             text: step.text,
           });
         });
@@ -1218,6 +1220,8 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
     };
     runinfo.flow.forEach(function(step) {
       run.flow.push({
+        wcCount: step.wcCount,
+        wc: step.wc,
         text: step.text,
         doneP: step.doneP ? true : false,
       });

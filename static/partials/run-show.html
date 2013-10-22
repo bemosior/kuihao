@@ -30,15 +30,19 @@
     <div class="span9">
       <table class="table table-bordered">
         <tbody>
-          <tr ng-repeat="flowitem in runinfo.flow" class="success">
-            <td>
+          <tr ng-repeat="flowitem in runinfo.flow">
+            <td width="15%">
               <button ng-show="$index >= currentStep" ng-disabled="$index != currentStep" class="btn btn-mini btn-primary" ng-click="markDone()">Done</button>
               <button ng-show="$index < currentStep" ng-disabled="$index != currentStep-1" class="btn btn-mini btn-primary" ng-click="unmarkDone()">Undo</button>
+              <br/>
+              {{flowitem.wc}}
+            </td>
+            <td>
               <span ng-style="strikeStyle(flowitem.doneP)">{{flowitem.text}}</span>
             </td>
           </tr>
           <tr ng-show="currentStep == runinfo.flow.length">
-            <td>
+            <td colspan=2>
               <button class="btn btn-mini btn-primary" ng-click="save()">Save</button>
               <button class="btn btn-mini btn-primary" ng-click="downloadSummary()">Download Summary</button>
             </td>
