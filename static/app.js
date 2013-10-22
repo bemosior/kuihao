@@ -885,7 +885,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
 
   $scope.runMe = function() {
     var run = Run.create(floorinfo.id);
-    $location.path('/run/' + run.id);
+    $location.path('/run/' + run);
   };
 
 });
@@ -1193,6 +1193,8 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
 
 kuihaoApp.controller('RunCtrl', function($scope, $routeParams, Run) {
 
+  var runinfo = null;
+
   $scope.save = function() {
     window.alert("Not implemented yet");
   };
@@ -1205,11 +1207,33 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, Run) {
     window.alert("Not implemented yet");
   };
 
+  $scope.downloadSummary = function() {
+    window.alert("Not implemented yet");
+  };
+
+  $scope.markDone = function() {
+    runinfo.flow[$scope.currentStep].doneP = true;
+    $scope.currentStep += 1;
+  };
+
+  $scope.unmarkDone = function() {
+    runinfo.flow[$scope.currentStep-1].doneP = false;
+    $scope.currentStep -= 1;
+  };
+
+  $scope.strikeStyle = function(doneP) {
+    return doneP ? {"text-decoration": "line-through"} : {};
+  };
+
   $scope.resetInit = function() {
     if ($routeParams.runId == null) {
       var runList = Run.list();
       $scope.runList = runList;
     } else {
+      runinfo = Run.fetch($routeParams.runId);
+      $scope.runinfo = runinfo;
+      $scope.floorname = runinfo.floorname + "(" + (new Date(runinfo.starttime)).toString() + ")";
+      $scope.currentStep = 0;
     };
   };
 
