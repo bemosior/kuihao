@@ -153,11 +153,23 @@ kuihaoApp.service('Run', function(Floor, WorkCenter) {
     };
     var wf = Floor.fetch(floorId);
     run.floorname = wf.name;
+    var wcCount = 0;
     wf.flow.forEach(function(stationId) {
       var wc = WorkCenter.fetch(stationId);
-      run.flow.push({
-        text: wc.name,
-      });
+      if (wc.steps.length == 0) {
+        run.flow.push({
+          wc: wcCount,
+          text: wc.name,
+        });
+      } else {
+        wc.steps.forEach(function(step) {
+          run.flow.push({
+            wc: wcCount,
+            text: step.text,
+          });
+        });
+      };
+      wcCount += 1;
     });
     var runList = JSON.parse(localStorage.getItem('kuihao.runlist'));
     if (runList == null) runList = [];
