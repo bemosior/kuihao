@@ -1196,7 +1196,23 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, Run) {
   var runinfo = null;
 
   $scope.save = function() {
-    window.alert("Not implemented yet");
+    // make sure steps are fixed since they also have angular markup on them
+    var run = {
+      id: runinfo.id,
+      floorId: runinfo.floorId,
+      flow: [],
+      starttime: runinfo.starttime,
+    };
+    runinfo.flow.forEach(function(step) {
+      console.log(step);
+      run.flow.push({
+        text: step.text,
+        doneP: step.doneP ? true : false,
+      });
+    });
+    console.log(run.flow);
+    Run.update(run);
+    window.alert("Saved!");
   };
 
   $scope.download = function() {
@@ -1233,7 +1249,13 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, Run) {
       runinfo = Run.fetch($routeParams.runId);
       $scope.runinfo = runinfo;
       $scope.floorname = runinfo.floorname + "(" + (new Date(runinfo.starttime)).toString() + ")";
-      $scope.currentStep = 0;
+      var currentStep = 0;
+      $scope.runinfo.flow.forEach(function(step) {
+        if (step.doneP) {
+          currentStep += 1;
+        };
+      });
+      $scope.currentStep = currentStep;
     };
   };
 
