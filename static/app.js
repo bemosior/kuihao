@@ -34,6 +34,7 @@ kuihaoApp.service('WorkCenter', function() {
 
   this.fetch = function(id) {
     var res = JSON.parse(localStorage.getItem('kuihao.wc.' + id));
+    if (res == null) return null;
     if (res.products == null) {
       res.products = [];
     };
