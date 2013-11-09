@@ -31,11 +31,12 @@
       <table class="table table-bordered">
         <tbody>
           <tr ng-repeat="flowitem in runinfo.flow">
-            <td width="15%">
+            <td width="30px">
               <button ng-show="$index >= currentStep" ng-disabled="$index != currentStep" class="btn btn-mini btn-primary" ng-click="markDone()">Done</button>
               <button ng-show="$index < currentStep" ng-disabled="$index != currentStep-1" class="btn btn-mini btn-primary" ng-click="unmarkDone()">Undo</button>
-              <br/>
-              {{flowitem.wc}}
+            </td>
+            <td width="15%">
+              <span ng-style="strikeStyle(flowitem.doneP)">{{flowitem.wc}}</span>
             </td>
             <td>
               <span ng-style="strikeStyle(flowitem.doneP)">{{flowitem.text}}</span>
