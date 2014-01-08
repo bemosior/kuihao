@@ -169,6 +169,7 @@ kuihaoApp.service('Run', function(Floor, WorkCenter) {
             wcCount: wcCount,
             wc: wc.name,
             text: step.text,
+            full: step.full,
           });
         });
       };
@@ -1213,7 +1214,9 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
         wcCount: step.wcCount,
         wc: step.wc,
         text: step.text,
+        full: step.full,
         doneP: step.doneP ? true : false,
+        expandP: step.expandP ? true : false,
       });
     });
     Run.update(run);
@@ -1237,16 +1240,23 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
 
   $scope.markDone = function() {
     runinfo.flow[$scope.currentStep].doneP = true;
+    $scope.flow[$scope.currentStep].doneP = true;
     $scope.currentStep += 1;
   };
 
   $scope.unmarkDone = function() {
     runinfo.flow[$scope.currentStep-1].doneP = false;
+    $scope.flow[$scope.currentStep-1].doneP = false;
     $scope.currentStep -= 1;
   };
 
   $scope.strikeStyle = function(doneP) {
     return doneP ? {"text-decoration": "line-through"} : {};
+  };
+
+  $scope.togglefull = function(stepId) {
+    runinfo.flow[stepId].expandP = !runinfo.flow[stepId].expandP;
+    $scope.flow[stepId].expandP = !$scope.flow[stepId].expandP;
   };
 
   $scope.resetInit = function() {
@@ -1255,6 +1265,16 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
       $scope.runList = runList;
     } else {
       runinfo = Run.fetch($routeParams.runId);
+      $scope.flow = [];
+      runinfo.flow.forEach(function(step) {
+        $scope.flow.push({
+          wc: step.wc,
+          text: step.text,
+          full: step.full,
+          doneP: step.doneP,
+          expandP: step.expandP || false,
+        });
+      });
       $scope.runinfo = runinfo;
       $scope.floorname = runinfo.floorname + "(" + (new Date(runinfo.starttime)).toString() + ")";
       var currentStep = 0;
