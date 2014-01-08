@@ -12,6 +12,13 @@ var generateUUID = function() {
 var kuihaoApp = angular.module('kuihaoApp', [], function() {
 })
 
+kuihaoApp.filter('prettyTime', function() {
+  return function(str) {
+    if (str == null) return null;
+    return (new Date(parseInt(str))).toLocaleString();
+  };
+});
+
 kuihaoApp.service('WorkCenter', function() {
 
   this.generateId = function() {
@@ -1215,7 +1222,7 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
         wc: step.wc,
         text: step.text,
         full: step.full,
-        doneP: step.doneP ? true : false,
+        doneTS: step.doneTS,
         expandP: step.expandP ? true : false,
       });
     });
@@ -1239,19 +1246,20 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
   };
 
   $scope.markDone = function() {
-    runinfo.flow[$scope.currentStep].doneP = true;
-    $scope.flow[$scope.currentStep].doneP = true;
+    var curTime = Math.round((new Date()).getTime());
+    runinfo.flow[$scope.currentStep].doneTS = curTime;
+    $scope.flow[$scope.currentStep].doneTS = curTime;
     $scope.currentStep += 1;
   };
 
   $scope.unmarkDone = function() {
-    runinfo.flow[$scope.currentStep-1].doneP = false;
-    $scope.flow[$scope.currentStep-1].doneP = false;
+    runinfo.flow[$scope.currentStep-1].doneTS = null;
+    $scope.flow[$scope.currentStep-1].doneTS = null;
     $scope.currentStep -= 1;
   };
 
-  $scope.strikeStyle = function(doneP) {
-    return doneP ? {"text-decoration": "line-through"} : {};
+  $scope.strikeStyle = function(doneTS) {
+    return (doneTS != null) ? {"text-decoration": "line-through"} : {};
   };
 
   $scope.togglefull = function(stepId) {
@@ -1271,7 +1279,7 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
           wc: step.wc,
           text: step.text,
           full: step.full,
-          doneP: step.doneP,
+          doneTS: step.doneTS,
           expandP: step.expandP || false,
         });
       });
@@ -1279,7 +1287,7 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
       $scope.floorname = runinfo.floorname + "(" + (new Date(runinfo.starttime)).toString() + ")";
       var currentStep = 0;
       $scope.runinfo.flow.forEach(function(step) {
-        if (step.doneP) {
+        if (step.doneTS != null) {
           currentStep += 1;
         };
       });

@@ -36,15 +36,16 @@
               <button ng-show="$index < currentStep" ng-disabled="$index != currentStep-1" class="btn btn-mini btn-primary" ng-click="unmarkDone()">Undo</button>
             </td>
             <td width="15%">
-              <span ng-style="strikeStyle(flowitem.doneP)">{{flowitem.wc}}</span>
+              <span ng-style="strikeStyle(flowitem.doneTS)">{{flowitem.wc}}</span><br/>
+              <span ng-show="true">{{flowitem.doneTS | prettyTime}}</span>
             </td>
             <td>
               <span ng-hide="!flowitem.expandP" ng-click="togglefull($index)"><i class="icon-plus-sign"></i></span>
               <span ng-hide="flowitem.expandP" ng-click="togglefull($index)"><i class="icon-minus-sign"></i></span>
-              <span ng-style="strikeStyle(flowitem.doneP)">{{flowitem.text}}</span>
+              <span ng-style="strikeStyle(flowitem.doneTS)">{{flowitem.text}}</span>
               <span ng-hide="flowitem.expandP">
               <br/>
-              <span ng-style="strikeStyle(flowitem.doneP)">{{flowitem.full}}</span>
+              <span ng-style="strikeStyle(flowitem.doneTS)">{{flowitem.full}}</span>
               </span>
             </td>
           </tr>
