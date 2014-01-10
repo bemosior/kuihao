@@ -893,7 +893,10 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
           var inputIdx = inputNames.indexOf(product.name);
           var outputIdx = outputNames.indexOf(product.name);
           if (inputIdx > -1 && outputIdx > -1) {
-            outputs[outputIdx].modified = inputs[outputIdx].modified.concat(product.change.replace("+",""));
+            // FIXME: in a split flow, something is not getting set correctly and it's trying
+            // to read inputs[outputIdx].modified when inputs[outputIdx] is not set. sampledata
+            // currently demonstrates this when the following line is uncommented.
+            //outputs[outputIdx].modified = inputs[outputIdx].modified.concat(product.change.replace("+",""));
           };
         };
       });
