@@ -212,6 +212,28 @@ kuihaoApp.service('Run', function(Floor, WorkCenter) {
 
 });
 
+kuihaoApp.service('Sample', function(Floor, WorkCenter, $route) {
+
+  this.load = function() {
+    console.log("Loading floorinfo");
+    var sample = sampledata.floorinfo();
+    for (var floorId in sample) {
+      if (Floor.fetch(floorId) == null) {
+        Floor.add(sample[floorId]);
+      };
+    };
+    console.log("Loading workcenterinfo");
+    var sample = sampledata.workcenterinfo();
+    for (var centerId in sample) {
+      if (WorkCenter.fetch(centerId) == null) {
+        WorkCenter.add(sample[centerId]);
+      };
+    };
+    $route.reload();
+  };
+
+});
+
 kuihaoApp.controller('PickCtrl', function($scope) {
 })
   .config(['$routeProvider', function($routeProvider) {
@@ -226,7 +248,7 @@ kuihaoApp.controller('PickCtrl', function($scope) {
     ;
   }]);
 
-kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $route, WorkCenter, Floor, Run) {
+kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $route, WorkCenter, Floor, Run, Sample) {
 
   var WIDTH = 800;
   var HEIGHT = 450;
@@ -248,15 +270,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   var mode = "show";
   var selectedStation = null;
 
-  $scope.loadSampleData = function() {
-    var sample = sampledata.floorinfo();
-    for (var floorId in sample) {
-      if (Floor.fetch(floorId) == null) {
-        Floor.add(sample[floorId]);
-      };
-    };
-    $route.reload();
-  };
+  $scope.loadSampleData = Sample.load;
 
   $scope.newWorkFloor = function() {
     var wf = {
@@ -913,7 +927,7 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
 
 });
 
-kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams, $route, WorkCenter) {
+kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams, $route, WorkCenter, Sample) {
 
   var WIDTH = 800;
 
@@ -922,15 +936,7 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
   var mode = "normal";
   var selectedResource = null;
 
-  $scope.loadSampleData = function() {
-    var sample = sampledata.workcenterinfo();
-    for (var centerId in sample) {
-      if (WorkCenter.fetch(centerId) == null) {
-        WorkCenter.add(sample[centerId]);
-      };
-    };
-    $route.reload();
-  };
+  $scope.loadSampleData = Sample.load;
 
   $scope.newWorkCenter = function() {
     var wc = {

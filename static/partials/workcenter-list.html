@@ -18,12 +18,15 @@
           <li><a href="#/run">Runs</a></li>
           <li class="nav-header">File</li>
           <li><a ng-click="newWorkCenter()">New Work Center</a></li>
-          <li><a ng-click="loadSampleData()">Load Sample Data</a></li>
         </ul>
       </div>
     </div>
-    <div class="span9">
-      <table class="table table-striped">
+    <div class="span9" ng-switch on="centerList.length">
+      <div class="nodata" ng-switch-when="0">
+No data found!<br/>
+Do you want to <a ng-click="loadSampleData()">load sample data</a>?
+      </div>
+      <table class="table table-striped" ng-switch-default>
         <thead><tr><th>#</th><th>Name</th><th>ID</th></tr></thead>
         <tbody>
           <tr ng-repeat="workcenter in centerList">
