@@ -1239,10 +1239,6 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
     window.alert("Saved!");
   };
 
-  $scope.download = function() {
-    window.alert("Not implemented yet");
-  };
-
   $scope.delete = function() {
     if (window.confirm("Delete \"" + runinfo.name + "\"?")) {
       Run.remove(runinfo.id);
@@ -1251,7 +1247,25 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
   };
 
   $scope.downloadSummary = function() {
-    window.alert("Not implemented yet");
+    var run = {
+      id: runinfo.id,
+      name: runinfo.id,
+      floorname: runinfo.floorname,
+      starttime: runinfo.starttime,
+      flow: [],
+    };
+    runinfo.flow.forEach(function(step) {
+      run.flow.push({
+        wc: step.wc,
+        text: step.text,
+        doneTS: step.doneTS,
+      });
+    });
+    var runblob = new Blob([JSON.stringify(run, undefined, 2)], {'type':'application/json'});
+    var dl = document.createElement("a");
+    dl.href = window.webkitURL.createObjectURL(runblob);
+    dl.download = "";
+    dl.click();
   };
 
   $scope.markDone = function() {
