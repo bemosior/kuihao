@@ -215,14 +215,12 @@ kuihaoApp.service('Run', function(Floor, WorkCenter) {
 kuihaoApp.service('Sample', function(Floor, WorkCenter, $route) {
 
   this.load = function() {
-    console.log("Loading floorinfo");
     var sample = sampledata.floorinfo();
     for (var floorId in sample) {
       if (Floor.fetch(floorId) == null) {
         Floor.add(sample[floorId]);
       };
     };
-    console.log("Loading workcenterinfo");
     var sample = sampledata.workcenterinfo();
     for (var centerId in sample) {
       if (WorkCenter.fetch(centerId) == null) {
