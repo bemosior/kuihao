@@ -961,7 +961,30 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
   };
 
   $scope.download = function() {
-    window.alert("Not implemented yet");
+    var wc = {
+      id: centerinfo.id,
+      name: centerinfo.name,
+      products: [],
+      steps: [],
+    };
+    centerinfo.products.forEach(function(product) {
+      wc.products.push({
+        name: product.name,
+        type: product.type,
+        change: product.change,
+      });
+    });
+    centerinfo.steps.forEach(function(step) {
+      wc.steps.push({
+        text: step.text,
+        full: step.full,
+      });
+    });
+    var wcblob = new Blob([JSON.stringify(wc, undefined, 2)], {'type':'application/json'});
+    var dl = document.createElement("a");
+    dl.href = window.webkitURL.createObjectURL(wcblob);
+    dl.download = "";
+    dl.click();
   };
 
   $scope.delete = function() {
