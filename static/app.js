@@ -306,7 +306,31 @@ kuihaoApp.controller('MainCtrl', function($scope, $routeParams, $location, $rout
   };
 
   $scope.download = function() {
-    window.alert("Not implemented yet");
+    var wc = {};
+    var wf = {
+      id: floorinfo.id,
+      name: floorinfo.name,
+      stations: {},
+      connections: floorinfo.connections,
+      flow: floorinfo.flow,
+    };
+    for (var stationId in floorinfo.stations) {
+      wf.stations[stationId] = {
+        id: floorinfo.stations[stationId].id,
+        loc: floorinfo.stations[stationId].loc,
+        type: floorinfo.stations[stationId].type,
+      };
+      if (floorinfo.stations[stationId].type == "product") {
+        wf.stations[stationId].name = floorinfo.stations[stationId].name;
+        wf.stations[stationId].modified = floorinfo.stations[stationId].modified;
+      };
+      wc[stationId] = WorkCenter.fetch(stationId);
+    }
+    var blob = new Blob([JSON.stringify({floorinfo: wf, workcenterinfo: wc}, undefined, 2)], {'type':'application/json'});
+    var dl = document.createElement("a");
+    dl.href = window.webkitURL.createObjectURL(blob);
+    dl.download = "";
+    dl.click();
   };
 
   $scope.delete = function() {
