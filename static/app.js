@@ -1257,9 +1257,175 @@ kuihaoApp.controller('WorkCenterCtrl', function($scope, $location, $routeParams,
 
 });
 
-kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
+kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run, Floor, WorkCenter) {
 
   var runinfo = null;
+  var floorDiagram = null;
+  var floor = null;
+  var WIDTH = 250,
+      HEIGHT = 250;
+  var WORKCENTER = {
+    height: 60,
+    width: 60,
+  };
+  var PRODUCT = {
+    height: 60,
+    width: 60,
+  };
+  var stationShapes = {};
+  var clusters = {};
+  var clusters_by_name = {};
+  var current_cluster = null;
+
+  redraw = function() {
+    var floorinfo = Floor.fetch(runinfo.floorId);
+    if ((typeof floorDiagram === 'undefined') || (floorDiagram === null)) {
+      floorDiagram = Raphael("floor", WIDTH, HEIGHT);
+    };
+    floorDiagram.clear();
+    for (var stationId in floorinfo.stations) {
+      var station = floorinfo.stations[stationId];
+      switch (station.type) {
+        case "product":
+          var set = floorDiagram.set();
+          var circle = floorDiagram.circle(station.loc[0], station.loc[1], PRODUCT.width/2)
+            .attr({
+              fill: "#8888ff",
+              stroke: "#000000",
+              "fill-opacity": 0.25,
+              "stroke-width": 2,
+            });
+          var productlabel = station.name;
+          if (station.modified != 0) {
+            productlabel += "\n" + station.modified.join(",");
+          };
+          var label = floorDiagram.text(station.loc[0], station.loc[1], productlabel);
+          set.push(circle, label);
+          stationShapes[station.id] = set;
+          break;
+        case "workcenter":
+          var set = floorDiagram.set();
+          var rect = floorDiagram.rect(station.loc[0]-WORKCENTER.width/2, station.loc[1]-WORKCENTER.height/2, WORKCENTER.width, WORKCENTER.height, 5)
+            .attr({
+              fill: "#008800",
+              stroke: "#000000",
+              "fill-opacity": 0.25,
+              "stroke-width": 2,
+            });
+          var wc = WorkCenter.fetch(station.id).name;
+          var label = floorDiagram.text(station.loc[0], station.loc[1], wc);
+          set.push(rect, label);
+          stationShapes[station.id] = set;
+          // create a blank cluster
+          clusters[station.id] = {
+            wc: wc,
+            shape: set,
+            neighbors: [],
+          };
+          clusters_by_name[wc] = clusters[station.id];
+          break;
+        default:
+          break;
+      };
+    };
+    for (var connectionId in floorinfo.connections) {
+      var connection = floorinfo.connections[connectionId];
+      var source = null;
+      if (floorinfo.stations[connection.source] !== undefined) {
+        source = floorinfo.stations[connection.source].loc;
+      };
+      var destination = null;
+      if (floorinfo.stations[connection.destination] !== undefined) {
+        destination = floorinfo.stations[connection.destination].loc;
+      };
+      if ((source !== null) && (destination !== null)) {
+        // Make sure this shows up in a cluster
+        if (floorinfo.stations[connection.source].type == "product") {
+          if (clusters[connection.destination].neighbors.indexOf(connection.source)) {
+            clusters[connection.destination].neighbors.push(connection.source);
+          };
+        } else if (floorinfo.stations[connection.destination].type == "product") {
+          if (clusters[connection.source].neighbors.indexOf(connection.destination)) {
+            clusters[connection.source].neighbors.push(connection.destination);
+          };
+        };
+        // Draw it
+        var pathStr = "M" + source + "L" + destination;
+        var path = floorDiagram.path(pathStr)
+          .toBack()
+          .attr({
+            "stroke-width": 3,
+            "stroke": "#c0c0c0",
+          });
+        var point = path.getPointAtLength(path.getTotalLength()/2);
+        var rotation = 0;
+        if (destination[0] == source[0]) {
+          if (destination[1] < source[1]) {
+            rotation = 0;
+          } else {
+            rotation = 180;
+          }
+        } else if (destination[0] < source[0]) {
+          rotation = Math.round(Math.atan( (destination[1]-source[1])/(destination[0]-source[0]) )*180/Math.PI)-90;
+        } else {
+          rotation = Math.round(Math.atan( (destination[1]-source[1])/(destination[0]-source[0]) )*180/Math.PI)+90;
+        };
+        floorDiagram.path("M0,-5L5,5L-5,5Z")
+          .transform("t" + [point.x,point.y] + "r" + rotation)
+          .attr({
+            stroke: "#000000",
+            fill: "#000000",
+          });
+      };
+    };
+    // Calulate all bouncing boxes
+    var floor_bbox = { x:0, y:0, x2:0, y2:0 }
+    for (clusterId in clusters) {
+      var bbox = stationShapes[clusterId].getBBox();
+      if (bbox.x < floor_bbox.x)   { floor_bbox.x = bbox.x; };
+      if (bbox.y < floor_bbox.y)   { floor_bbox.y = bbox.y; };
+      if (bbox.x2 > floor_bbox.x2) { floor_bbox.x2 = bbox.x2; };
+      if (bbox.y2 > floor_bbox.y2) { floor_bbox.y2 = bbox.y2; };
+      clusters[clusterId].neighbors.forEach(function (neighbor) {
+        var bbox_neighbor = stationShapes[neighbor].getBBox();
+        if (bbox_neighbor.x < bbox.x)   { bbox.x = bbox_neighbor.x; };
+        if (bbox_neighbor.y < bbox.y)   { bbox.y = bbox_neighbor.y; };
+        if (bbox_neighbor.x2 > bbox.x2) { bbox.x2 = bbox_neighbor.x2; };
+        if (bbox_neighbor.y2 < bbox.y2) { bbox.y2 = bbox_neighbor.y2; };
+      });
+      bbox.width  = bbox.x2-bbox.x;
+      bbox.height = bbox.y2-bbox.y;
+      clusters[clusterId].bbox = bbox;
+    };
+    floor = floorDiagram.rect(floor_bbox.x-100, floor_bbox.y-100, floor_bbox.x2-floor_bbox.x+200, floor_bbox.y2-floor_bbox.y+200)
+      .attr({
+        fill: "#ffffff",
+      });
+    floor.toBack();
+    set_viewport();
+  };
+
+  set_viewport = function() {
+    if (current_cluster != null) {
+      current_cluster.shape.attr({'fill-opacity': 0.25});
+      current_cluster.neighbors.forEach(function (stationId) {
+        stationShapes[stationId].attr({'fill-opacity': 0.25});
+      });
+    };
+    if (runinfo.flow[$scope.currentStep] != null) {
+      cluster = clusters_by_name[runinfo.flow[$scope.currentStep].wc];
+      cluster.neighbors.forEach(function (stationId) {
+        stationShapes[stationId].attr({'fill-opacity': 1.0});
+      });
+      cluster.shape.attr({'fill-opacity': 1.0});
+      //cluster.shape.attr({stroke: "#ffff00"});
+      bbox = cluster.bbox;
+      current_cluster = cluster;
+      floorDiagram.setViewBox(bbox.x-5, bbox.y-5, bbox.x2-bbox.x+10, bbox.y2-bbox.y+10);
+    } else {
+      floorDiagram.setViewBox(floor.attrs.x, floor.attrs.y, floor.attrs.width, floor.attrs.height);
+    };
+  };
 
   $scope.save = function() {
     // make sure steps are fixed since they also have angular markup on them
@@ -1318,12 +1484,14 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
     runinfo.flow[$scope.currentStep].doneTS = curTime;
     $scope.flow[$scope.currentStep].doneTS = curTime;
     $scope.currentStep += 1;
+    set_viewport();
   };
 
   $scope.unmarkDone = function() {
     runinfo.flow[$scope.currentStep-1].doneTS = null;
     $scope.flow[$scope.currentStep-1].doneTS = null;
     $scope.currentStep -= 1;
+    set_viewport();
   };
 
   $scope.strikeStyle = function(doneTS) {
@@ -1361,6 +1529,7 @@ kuihaoApp.controller('RunCtrl', function($scope, $routeParams, $location, Run) {
       });
       $scope.currentStep = currentStep;
     };
+    redraw();
   };
 
 });
