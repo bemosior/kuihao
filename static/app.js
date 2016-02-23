@@ -9,7 +9,7 @@ var generateUUID = function() {
   });
 };
 
-var kuihaoApp = angular.module('kuihaoApp', [], function() {
+var kuihaoApp = angular.module('kuihaoApp', ['ngRoute'], function() {
 })
 
 kuihaoApp.filter('prettyTime', function() {
